@@ -6,129 +6,127 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (16Personalities Style)
+# 1. Page Config & CSS (LINE誘導特化)
 # ==========================================
 st.set_page_config(
     page_title="Project MAP",
-    page_icon=None, # 絵文字アイコン削除
+    page_icon=None,
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-    /* 全体設定: 清潔な白背景 */
+    /* ベーススタイル */
     .stApp {
         background-color: #FFFFFF;
         color: #333333;
         font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
     }
     
-    /* カードデザイン: 淡い枠線と余白 */
-    .result-card {
-        background-color: #F9F9F9; /* 極めて薄いグレー */
+    /* カードデザイン（宿命エリア用） */
+    .identity-card {
+        background-color: #F9F9F9;
         padding: 40px;
         border-radius: 12px;
         border: 1px solid #E0E0E0;
         margin-bottom: 30px;
-        text-align: center; /* 基本中央揃え */
+        text-align: center;
     }
     
-    /* ヘッダー: 太いゴシック体 */
-    h1, h2, h3 {
-        color: #333333 !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.02em !important;
+    /* カードデザイン（科学エリア・寸止め用） */
+    .analysis-card {
+        position: relative; /* オーバーレイの基準 */
+        background-color: #FFFFFF;
+        border: 2px solid #F0F0F0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        overflow: hidden;
     }
     
-    /* タイプ名（IDENTITYエリア用） */
-    .identity-title {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #888888;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        margin-bottom: 10px;
+    /* ぼかしエフェクト（クラス付与で制御） */
+    .blurred-content {
+        filter: blur(8px);
+        opacity: 0.6;
+        pointer-events: none; /* クリック不可 */
+        user-select: none;    /* コピー不可 */
+    }
+    
+    /* タイトル類 */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #333;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #333;
+        display: inline-block;
     }
     
     .identity-name {
-        font-size: 2.4rem;
+        font-size: 2.2rem;
         font-weight: 900;
         color: #2c3e50;
-        line-height: 1.2;
+        margin-bottom: 15px;
+    }
+    
+    .hook-text-warning {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #D32F2F; /* 赤 */
+        background-color: #FFEBEE;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #D32F2F;
         margin-bottom: 20px;
     }
     
-    /* キャッチコピー */
-    .identity-copy {
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: #555555;
-        margin-bottom: 30px;
-        line-height: 1.6;
+    .hook-text-success {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #388E3C; /* 緑 */
+        background-color: #E8F5E9;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #388E3C;
+        margin-bottom: 20px;
     }
 
-    /* 質問文のスタイル */
-    .question-text {
+    /* 質問文 */
+    .q-text {
         font-weight: 600;
-        font-size: 1.05rem;
-        margin-bottom: 10px;
-        color: #444;
-    }
-    
-    /* タブの見た目調整 */
-    .stTabs [data-baseweb="tab-list"] {
-        justify-content: center;
-    }
-    
-    /* FATE Codeチップ */
-    .fate-badge {
-        display: inline-block;
-        background-color: #333;
-        color: #fff;
-        padding: 6px 16px;
-        border-radius: 30px;
-        font-weight: bold;
-        font-size: 0.9rem;
-        margin-bottom: 20px;
+        margin-bottom: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. Helper Functions (Image Loader with Swap Fix)
+# 2. Helper Functions
 # ==========================================
 def load_image(type_id):
-    """
-    画像のパスを柔軟に探す関数
-    ★修正: Type 8 と Type 9 の画像を入れ替えるロジックを追加
-    """
-    # スワップ処理 (ロジック上のID -> 画像ファイル名のID)
-    target_file_id = type_id
-    if type_id == 8:
-        target_file_id = 9
-    elif type_id == 9:
-        target_file_id = 8
+    """画像のパス探索（8と9の入れ替えロジック維持）"""
+    target_id = type_id
+    if type_id == 8: target_id = 9
+    elif type_id == 9: target_id = 8
         
     extensions = ['.png', '.jpg', '.jpeg', '.PNG', '.JPG']
     base_dir = "images"
     
     if not os.path.exists(base_dir):
-        return None, f"Error: '{base_dir}' folder not found."
+        return None
     
     for ext in extensions:
-        filename = f"{target_file_id}{ext}"
-        file_path = os.path.join(base_dir, filename)
-        if os.path.exists(file_path):
-            return file_path, None
-            
-    return None, f"Image not found for Type {target_file_id} in {base_dir}"
+        filename = f"{target_id}{ext}"
+        path = os.path.join(base_dir, filename)
+        if os.path.exists(path):
+            return path
+    return None
 
 # ==========================================
-# 3. Logic Data & Content
+# 3. Logic Data
 # ==========================================
 
-# TIPI-J 質問項目
 TIPI_QUESTIONS = {
     "Q1": "活発で、外向的だと思う", "Q2": "他人に不満をもち、もめごとを起こしやすいと思う",
     "Q3": "しっかりしていて、自分に厳しいと思う", "Q4": "心配性で、うろたえやすいと思う",
@@ -137,12 +135,9 @@ TIPI_QUESTIONS = {
     "Q9": "冷静で、気分が安定していると思う", "Q10": "発想力に欠けた、平凡な人間だと思う"
 }
 
-# FATE Code 解説
 FATE_EXPLANATION = {
-    "L": {"title": "Logic", "desc": "事実とデータ重視"}, "S": {"title": "Sense", "desc": "直感と感性重視"},
-    "R": {"title": "Risk", "desc": "堅実なリスク管理"}, "G": {"title": "Growth", "desc": "挑戦と拡大志向"},
-    "I": {"title": "Impulse", "desc": "瞬発力とエネルギー"}, "D": {"title": "Deliberate", "desc": "熟考と計画性"},
-    "M": {"title": "Me", "desc": "自分軸・独立心"}, "Y": {"title": "You", "desc": "協調性・他者貢献"}
+    "L": "Logic (論理)", "S": "Sense (感覚)", "R": "Risk (堅実)", "G": "Growth (成長)",
+    "I": "Impulse (衝動)", "D": "Deliberate (熟考)", "M": "Me (自我)", "Y": "You (協調)"
 }
 
 # 診断コンテンツ
@@ -270,13 +265,6 @@ ENERGY_STRENGTH = [
     [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1], [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1],
     [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3], [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3]
 ]
-COMPATIBILITY_MAP = {
-    0: ["No.6 尽くす世話焼き", "No.7 正義の切り込み隊長", "No.4 熱き夢想家"], 1: ["No.7 正義の切り込み隊長", "No.8 繊細な宝石", "No.3 天性の主人公"],
-    2: ["No.8 繊細な宝石", "No.9 自由な冒険家", "No.5 不動の守護神"], 3: ["No.9 自由な冒険家", "No.10 癒やしの共感者", "No.6 尽くす世話焼き"],
-    4: ["No.10 癒やしの共感者", "No.1 頼れる親分肌", "No.7 正義の切り込み隊長"], 5: ["No.1 頼れる親分肌", "No.2 愛され調整役", "No.8 繊細な宝石"],
-    6: ["No.2 愛され調整役", "No.3 天性の主人公", "No.9 自由な冒険家"], 7: ["No.3 天性の主人公", "No.4 熱き夢想家", "No.10 癒やしの共感者"],
-    8: ["No.4 熱き夢想家", "No.5 不動の守護神", "No.1 頼れる親分肌"], 9: ["No.5 不動の守護神", "No.6 尽くす世話焼き", "No.2 愛され調整役"]
-}
 
 # ==========================================
 # 4. Logic Engines
@@ -290,28 +278,29 @@ def calculate_big5(answers):
         "Neuroticism": answers["Q4"] + (8 - answers["Q9"]),
         "Openness": answers["Q5"] + (8 - answers["Q10"])
     }
-    # 1-5段階へ正規化
     scores_norm = {k: round(1 + (v - 2) * 4 / 12, 1) for k, v in scores_raw.items()}
     return scores_raw, scores_norm
 
-def analyze_big5(scores_norm, fate_type_id):
-    analysis = []
-    if scores_norm["Conscientiousness"] <= 2.5:
-        analysis.append("⚠️ **勤勉性が低め:** アドリブに強い反面、計画性が不足しがち。仕組み化でカバーを。")
-    if scores_norm["Neuroticism"] >= 4.0:
-        analysis.append("🧠 **感受性が高い:** 小さなミスを気にしすぎないよう、「まあいいか」を口癖に。")
-    if scores_norm["Openness"] >= 4.0:
-        analysis.append("✨ **高い開放性:** 常に新しい刺激がある環境が幸福の鍵です。")
+def get_gap_hook(fate_type_id, scores_norm):
+    """
+    宿命(Type)と現在(Big5)のギャップを判定し、フック文章を返す
+    """
+    is_gap = False
     
-    warnings = []
+    # Type 0,2,6 (外向型) vs Extraversion
     if fate_type_id in [0, 2, 6] and scores_norm["Extraversion"] < 2.5:
-        warnings.append("本来は人を引っ張る力を持っていますが、現在は少し自信を失っているかもしれません。")
-    if fate_type_id in [1, 9] and scores_norm["Agreeableness"] < 2.5:
-        warnings.append("本来は協調性が高いタイプですが、現在は人間関係に疲れている可能性があります。")
-    if fate_type_id in [4, 7] and scores_norm["Conscientiousness"] < 2.5:
-        warnings.append("本来は堅実なこだわり屋ですが、現在は生活リズムが乱れているかもしれません。")
-
-    return analysis, warnings
+        is_gap = True
+    # Type 1,9 (協調型) vs Agreeableness
+    elif fate_type_id in [1, 9] and scores_norm["Agreeableness"] < 2.5:
+        is_gap = True
+    # Type 4,7 (堅実型) vs Conscientiousness
+    elif fate_type_id in [4, 7] and scores_norm["Conscientiousness"] < 2.5:
+        is_gap = True
+        
+    if is_gap:
+        return "WARNING", "⚠️ 注意：あなたの本来の強みが、現在60%死んでいます。"
+    else:
+        return "SUCCESS", "✨ 素晴らしい：宿命通りに才能が発揮されています。ただし…"
 
 class FortuneEngineIntegrated:
     def __init__(self):
@@ -375,7 +364,7 @@ class FortuneEngineIntegrated:
         axis_4 = "M" if scores_raw["Identity"] * 1.5 >= social else "Y"
         fate_code = f"{axis_1}{axis_2}{axis_3}{axis_4}"
 
-        return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
+        return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code}
 
 # ==========================================
 # 5. Main UI Application
@@ -383,136 +372,122 @@ class FortuneEngineIntegrated:
 
 st.title("Project MAP")
 
-# タブによる大区分
-main_tab, catalog_tab = st.tabs(["DIAGNOSIS (診断)", "ALL TYPES (図鑑)"])
+# タブ区分
+main_tab, catalog_tab = st.tabs(["DIAGNOSIS", "ALL TYPES"])
 
-# --- Tab 1: 診断 & 結果 ---
+# --- Tab 1: 診断 ---
 with main_tab:
-    # A. 入力フォームエリア
+    # A. 入力フォーム
     with st.form("diagnosis_form"):
         st.markdown("### 1. 生年月日")
         col_y, col_m, col_d = st.columns([1.2, 1, 1])
-        with col_y:
-            year = st.selectbox("年", list(range(1900, 2031)), index=95)
-        with col_m:
-            month = st.selectbox("月", list(range(1, 13)), index=0)
-        with col_d:
-            day = st.selectbox("日", list(range(1, 32)), index=0)
+        with col_y: year = st.selectbox("年", list(range(1900, 2031)), index=95)
+        with col_m: month = st.selectbox("月", list(range(1, 13)), index=0)
+        with col_d: day = st.selectbox("日", list(range(1, 32)), index=0)
             
         st.markdown("---")
         st.markdown("### 2. 科学的性格診断 (TIPI-J)")
         st.caption("直感で答えてください（1:全く違う 〜 7:強くそう思う）")
         
-        # 質問ループのバグ修正：質問文を表示してからスライダーを配置
         tipi_answers = {}
         for q_id, q_text in TIPI_QUESTIONS.items():
-            st.markdown(f"<div class='question-text'>{q_text}</div>", unsafe_allow_html=True)
-            tipi_answers[q_id] = st.slider(f"", 1, 7, 4, key=f"form_{q_id}") # labelは空にする
-            st.markdown("<br>", unsafe_allow_html=True) # 余白
+            st.markdown(f"<div class='q-text'>{q_text}</div>", unsafe_allow_html=True)
+            tipi_answers[q_id] = st.slider(f"", 1, 7, 4, key=f"form_{q_id}")
+            st.markdown("<br>", unsafe_allow_html=True)
             
-        st.markdown("<br>", unsafe_allow_html=True)
         submitted = st.form_submit_button("診断結果を見る", type="primary", use_container_width=True)
     
-    # B. 診断結果エリア
+    # B. 結果表示 (Identity=公開, Analysis=寸止め)
     if submitted:
         try:
             date_obj = datetime.date(year, month, day)
             date_str = date_obj.strftime("%Y/%m/%d")
             
-            # エンジン実行
+            # ロジック実行
             engine = FortuneEngineIntegrated()
             result = engine.analyze_basic(date_str)
             gan_id = result['gan']
             content = DIAGNOSIS_CONTENT[gan_id]
-            fate_scores = result['scores']
             fate_code = result['fate_code']
             
-            # Big Five 計算
+            # Big Five & Gap Analysis
             _, big5_norm = calculate_big5(tipi_answers)
-            analysis_text, warnings = analyze_big5(big5_norm, gan_id)
+            status, hook_text = get_gap_hook(gan_id, big5_norm)
 
-            # === AREA 1: IDENTITY (Fixed) ===
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            st.markdown("<div class='identity-title'>IDENTITY</div>", unsafe_allow_html=True)
+            # === AREA 1: IDENTITY (全公開) ===
+            st.markdown('<div class="section-title">IDENTITY (宿命)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="identity-card">', unsafe_allow_html=True)
+            
             st.markdown(f"<div class='identity-name'>{content['type_name']}</div>", unsafe_allow_html=True)
             
-            # 画像表示
-            type_id = gan_id + 1
-            img_path, _ = load_image(type_id)
+            img_path = load_image(gan_id + 1)
             if img_path:
                 st.image(img_path, use_container_width=True)
             else:
                 st.image("https://placehold.co/400x400/F0F0F0/333?text=No+Image", use_container_width=True)
             
-            st.markdown(f"<div class='identity-copy'>{content['catch_copy']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<span class='fate-badge'>{fate_code}</span>", unsafe_allow_html=True)
+            st.markdown(f"**{content['catch_copy']}**")
+            st.markdown(f"<br><span class='fate-chip'>{fate_code}</span>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # === AREA 2: ANALYSIS (Variable) ===
-            st.markdown("### 現在のあなたの状態 (科学的分析)")
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            
-            categories = ['外向性', '開放性', '協調性', '勤勉性', '情緒安定']
-            # Fateスコアのマッピング (近似値)
-            fate_vals = [fate_scores['Identity'], fate_scores['Create'], fate_scores['Economy'], fate_scores['Status'], fate_scores['Vitality']]
-            # Scienceスコア
-            science_vals = [big5_norm['Extraversion'], big5_norm['Openness'], big5_norm['Agreeableness'], big5_norm['Conscientiousness'], 6 - big5_norm['Neuroticism']]
-            
-            fig = go.Figure()
-            fig.add_trace(go.Scatterpolar(r=fate_vals, theta=categories, fill='toself', name='宿命(Fate)', line_color='#BDBDBD', opacity=0.4))
-            fig.add_trace(go.Scatterpolar(r=science_vals, theta=categories, fill='toself', name='現在(Science)', line_color='#00c853', opacity=0.7))
-            fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=True, margin=dict(t=20, b=20, l=40, r=40), height=300)
-            st.plotly_chart(fig, use_container_width=True)
-            
-            st.write(analysis_text)
-            if warnings:
-                st.markdown("---")
-                st.error("ギャップ検知:")
-                for w in warnings: st.write(f"- {w}")
-            st.markdown('</div>', unsafe_allow_html=True)
-
-            # 詳細コンテンツ
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            st.markdown("#### 基本性格")
+            # 詳細テキスト (Work/Love/Desire)
+            st.markdown('<div class="identity-card" style="text-align:left;">', unsafe_allow_html=True)
+            st.markdown("#### 👤 基本性格")
             st.write(content['desc'])
-            st.markdown("#### 仕事の流儀")
+            st.markdown(f"#### ⚔️ {content['work_style_title']}")
             st.write(content['work'])
-            st.markdown("#### 恋愛スタイル")
+            st.markdown("#### 💖 恋愛スタイル")
             st.write(content['love'])
-            st.markdown("---")
-            st.markdown("#### 運命の相性")
-            partners = result['partners']
-            st.write(f"🥇 {partners[0]}")
-            st.write(f"🥈 {partners[1]}")
-            st.write(f"🥉 {partners[2]}")
+            st.markdown("#### 🧠 欲求 (Core Drive)")
+            st.write(content['desire'])
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # CTA
-            st.markdown('<div class="result-card" style="border: 2px solid #333;">', unsafe_allow_html=True)
-            st.markdown("### 🔒 完全版レポート")
-            st.write("コミュニケーションの癖 / ストレス反応 / 科学的ソリューション...")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.link_button("LINEで受け取る (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+            # === AREA 2: ANALYSIS (寸止め・チラ見せ) ===
+            st.markdown('<div class="section-title">ANALYSIS (科学的分析)</div>', unsafe_allow_html=True)
+            
+            # フック文章のみ表示 (赤 or 緑)
+            if status == "WARNING":
+                st.markdown(f"<div class='hook-text-warning'>{hook_text}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='hook-text-success'>{hook_text}</div>", unsafe_allow_html=True)
+            
+            # 寸止めエリア (グラフなどはぼかす)
+            st.markdown('<div class="analysis-card">', unsafe_allow_html=True)
+            
+            # ぼかし対象コンテンツ
+            st.markdown('<div class="blurred-content">', unsafe_allow_html=True)
+            categories = ['外向性', '開放性', '協調性', '勤勉性', '情緒安定']
+            fig = go.Figure()
+            fig.add_trace(go.Scatterpolar(r=[3,3,3,3,3], theta=categories, fill='toself', name='宿命'))
+            fig.add_trace(go.Scatterpolar(r=[2,4,2,4,2], theta=categories, fill='toself', name='現在'))
+            fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), height=300)
+            st.plotly_chart(fig, use_container_width=True)
+            st.write("ここに詳細な分析結果が表示されます。あなたの性格の歪みや、ストレス反応、具体的な解決策などが記述されます...")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # CTAボタン (オーバーレイ)
+            st.markdown("""
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; text-align: center;">
+                <p style="font-weight:bold; background:white; padding:5px;">🔒 続きはLINEで確認</p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.link_button("LINEで完全な分析レポートを見る (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+            
             st.markdown('</div>', unsafe_allow_html=True)
 
         except ValueError:
             st.error("正しい日付を選択してください。")
 
-# --- Tab 2: 全タイプ図鑑 ---
+# --- Tab 2: 図鑑 ---
 with catalog_tab:
     st.markdown("### 全10タイプ図鑑")
     cols = st.columns(2)
     for i in range(10):
         c = DIAGNOSIS_CONTENT[i]
-        type_id = i + 1
         with cols[i % 2]:
-            st.markdown('<div class="result-card" style="padding:15px;">', unsafe_allow_html=True)
-            img_path, _ = load_image(type_id)
-            if img_path:
-                st.image(img_path, use_container_width=True)
-            else:
-                st.image("https://placehold.co/200x200/F0F0F0/333?text=No+Image", use_container_width=True)
-            
+            st.markdown('<div class="identity-card" style="padding:15px; margin-bottom:15px;">', unsafe_allow_html=True)
+            path = load_image(i + 1)
+            if path: st.image(path, use_container_width=True)
+            st.caption(f"No.{i+1}")
             st.markdown(f"**{c['type_name']}**")
-            st.caption(c['catch_copy'].replace("\n", " "))
             st.markdown('</div>', unsafe_allow_html=True)
