@@ -6,13 +6,13 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS
+# 1. Page Config & CSS (スマホ特化)
 # ==========================================
 st.set_page_config(
-    page_title="Project MAP | AI性格診断",
+    page_title="Project MAP",
     page_icon="🔮",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="centered", # スマホで見やすいよう中央寄せ
+    initial_sidebar_state="collapsed" # サイドバーは隠す
 )
 
 st.markdown("""
@@ -20,31 +20,29 @@ st.markdown("""
     /* 全体設定 */
     .stApp {
         background-color: #f8f9fa;
-        font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         color: #333333;
     }
     
-    /* カードデザイン */
+    /* スマホ向けカードデザイン */
     .stCard {
         background-color: #ffffff;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border: 1px solid #e9ecef;
-        margin-bottom: 24px;
+        padding: 20px;
+        border-radius: 16px; /* 角丸を強く */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid #f0f0f0;
+        margin-bottom: 20px;
     }
     
-    /* 見出しデザイン */
-    .custom-header {
-        border-left: 6px solid #00c853;
-        padding-left: 12px;
-        font-size: 1.4rem;
-        font-weight: 700;
+    /* 強調見出し */
+    .mobile-header {
+        font-size: 1.3rem;
+        font-weight: 800;
         color: #2c3e50;
-        margin-top: 20px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
+        margin-top: 24px;
+        margin-bottom: 12px;
+        border-bottom: 2px solid #00c853;
+        display: inline-block;
     }
     
     /* FATE Codeチップ */
@@ -53,43 +51,36 @@ st.markdown("""
         background-color: #e8f5e9;
         color: #2e7d32;
         padding: 4px 12px;
-        border-radius: 16px;
-        font-size: 0.9rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
         font-weight: bold;
-        margin-right: 8px;
-        margin-bottom: 8px;
+        margin-right: 5px;
+        margin-bottom: 5px;
         border: 1px solid #c8e6c9;
-    }
-    
-    /* ぼかしエリア */
-    .blur-container {
-        filter: blur(6px);
-        opacity: 0.5;
-        pointer-events: none;
-        user-select: none;
     }
     
     /* キャッチコピー */
     .hero-catch {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         background: linear-gradient(90deg, #2c3e50, #00c853);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
-        line-height: 1.4;
-        margin-top: 10px;
-        margin-bottom: 15px;
+        line-height: 1.3;
+        margin: 10px 0;
     }
     
-    /* タブのスタイル調整 */
+    /* タブのスタイル調整（スマホで押しやすく） */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
+        gap: 8px;
     }
     .stTabs [data-baseweb="tab"] {
         height: 50px;
+        flex: 1; /* 等分して広げる */
         white-space: pre-wrap;
-        border-radius: 4px 4px 0 0;
+        border-radius: 8px;
         font-weight: bold;
+        font-size: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -117,7 +108,7 @@ def load_image(type_id):
 # 3. Logic Data & Content Expansion
 # ==========================================
 
-# TIPI-J (Big Five) 質問項目
+# TIPI-J 質問項目
 TIPI_QUESTIONS = {
     "Q1": "活発で、外向的だと思う", "Q2": "他人に不満をもち、もめごとを起こしやすいと思う",
     "Q3": "しっかりしていて、自分に厳しいと思う", "Q4": "心配性で、うろたえやすいと思う",
@@ -138,9 +129,9 @@ FATE_EXPLANATION = {
     "Y": {"title": "You (協調)", "desc": "他者との関わりの中で価値を生み出すバランサー。"}
 }
 
-# 診断コンテンツ（完全版：ここが重要です）
+# 診断コンテンツ
 DIAGNOSIS_CONTENT = {
-    0: { # 甲
+    0: {
         "type_name": "No.1 頼れる親分肌（THE LEADER）",
         "catch_copy": "折れない信念を持つ、\n孤高の統率者",
         "desc": "あなたは大樹のように真っ直ぐで、曲がったことが大嫌いな正義の人です。混乱した状況でも一本の道筋を示すことができるリーダーシップを持っており、周囲から「この人についていけば大丈夫」という絶対的な信頼を集めます。",
@@ -151,7 +142,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "尊敬・成長",
         "flaw_desc": "融通ゼロ。正論で相手を追い詰め、孤立することがあります。「負けるが勝ち」を覚えましょう。"
     },
-    1: { # 乙
+    1: {
         "type_name": "No.2 愛され調整役（THE CONNECTOR）",
         "catch_copy": "したたかに生き残る、\n柔軟な戦略家",
         "desc": "あなたはどんな環境でも、草花のように柔軟に形を変えて生き残るサバイバーです。表立って争うことを避け、笑顔で周囲を調整しながら、いつの間にか自分に有利なポジションを確保する賢さがあります。",
@@ -162,7 +153,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "調和・安全",
         "flaw_desc": "八方美人すぎて「で、本音は？」と言われがち。依存心が強く、決断を人任せにする癖があります。"
     },
-    2: { # 丙
+    2: {
         "type_name": "No.3 天性の主人公（THE PROTAGONIST）",
         "catch_copy": "世界を照らす、\nあくなき挑戦者",
         "desc": "あなたはそこにいるだけでその場がパッと明るくなる、太陽のような存在です。裏表がなく、感情がすべて顔に出るため、誰からも愛されます。「なんとかなる！」という根拠のない自信で突き進むパワーを持っています。",
@@ -173,7 +164,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "注目・称賛",
         "flaw_desc": "「私の話を聞け！」なジャイアン気質。人の話を聞いているようで、次は自分が何を話そうか考えています。"
     },
-    3: { # 丁
+    3: {
         "type_name": "No.4 熱き夢想家（THE MUSE）",
         "catch_copy": "静寂に燃える、\n知性の灯火",
         "desc": "あなたは一見穏やかで物静かですが、内側にはドロドロとした情熱や独自の美学、そして反骨精神を秘めています。鋭い洞察力を持ち、誰も気づかないような微細な変化や本質を見抜くことができます。",
@@ -184,7 +175,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "理解・美学",
         "flaw_desc": "察してちゃん界のラスボス。言葉にせず「わかってよ」オーラを出し、勝手に傷つく面倒くさい一面も。"
     },
-    4: { # 戊
+    4: {
         "type_name": "No.5 不動の守護神（THE ANCHOR）",
         "catch_copy": "すべてを受け入れる、\n揺るがぬ巨塔",
         "desc": "あなたはちょっとやそっとのことでは動じない、圧倒的な包容力の持ち主です。相談事をされると「うんうん」と聞いているだけで相手を安心させてしまう、人間パワースポットのような器の大きさがあります。",
@@ -195,7 +186,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "安定・信頼",
         "flaw_desc": "テコでも動かない頑固オヤジ。変化を嫌い、現状維持バイアスがかかりすぎてチャンスを逃すことも。"
     },
-    5: { # 己
+    5: {
         "type_name": "No.6 尽くす世話焼き（THE NURTURER）",
         "catch_copy": "才ある者を育む、\n慈愛の大地",
         "desc": "あなたは困っている人を放っておけない、根っからの教育者でありサポーターです。自分自身がトップに立つよりも、他人の才能を見抜き、育て、輝かせることに無上の喜びを感じます。",
@@ -206,7 +197,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "貢献・親密",
         "flaw_desc": "尽くしすぎてダメンズ製造機。感謝の見返りがないと「あんなにしてあげたのに」と愚痴っぽくなります。"
     },
-    6: { # 庚
+    6: {
         "type_name": "No.7 正義の切り込み隊長（THE HERO）",
         "catch_copy": "時代を切り拓く、\n鋼の革命家",
         "desc": "あなたは「それはおかしい」と声を上げ、古い体制や悪習を一刀両断する改革者です。白黒ハッキリつけないと気が済まない性格で、そのスピード感と決断力は組織の停滞を打破する起爆剤となります。",
@@ -217,7 +208,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "変革・勝利",
         "flaw_desc": "デリカシー？何それ美味しいの？ 正論というナイフで相手を滅多刺しにしてしまうことがあります。"
     },
-    7: { # 辛
+    7: {
         "type_name": "No.8 繊細な宝石（THE IDOL）",
         "catch_copy": "試練を輝きに変える、\n美しきカリスマ",
         "desc": "あなたは生まれながらにして「特別感」を漂わせる、美意識の高い人です。宝石が研磨されて輝くように、人生の試練や苦労を糧にして、人間的な深みや魅力を増していきます。感受性が鋭く、独自のセンスを持っています。",
@@ -228,7 +219,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "特別感・洗練",
         "flaw_desc": "メンタル強度スライム級のワガママ。プライドが高く、自分から謝るのが死ぬほど嫌いです。"
     },
-    8: { # 壬
+    8: {
         "type_name": "No.9 自由な冒険家（THE NOMAD）",
         "catch_copy": "境界を超えて流れる、\n自由の象徴",
         "desc": "あなたは一箇所に留まることができない、永遠の旅人です。スケールが大きく、常に新しい刺激や知識を求めて流動しています。「普通こうだよね」という枠に収まらない発想を持ち、組織に新しい風を吹き込みます。",
@@ -239,7 +230,7 @@ DIAGNOSIS_CONTENT = {
         "desire": "自由・流動",
         "flaw_desc": "ふらっと消える音信不通の常習犯。責任や約束を重荷に感じ、大事な局面で逃亡することも。"
     },
-    9: { # 癸
+    9: {
         "type_name": "No.10 癒やしの共感者（THE COUNSELOR）",
         "catch_copy": "静かに浸透する、\n慈愛の賢者",
         "desc": "あなたは雨のように静かに、しかし確実に大地（人の心）に染み渡る存在です。派手な自己主張はしませんが、驚くほどの知識と知恵を持っており、ここぞという時に核心を突くアドバイスをします。",
@@ -290,27 +281,25 @@ def calculate_big5(answers):
     return scores_raw, scores_norm
 
 def analyze_big5(scores_norm, fate_type_id):
-    """
-    BigFiveスコアの詳細分析と、宿命(Type)とのギャップ分析を行う
-    """
+    """BigFiveスコアの詳細分析と、宿命(Type)とのギャップ分析"""
     analysis = []
     
     # 1. 各パラメータの個別アドバイス
     if scores_norm["Conscientiousness"] <= 2.5:
-        analysis.append("⚠️ **勤勉性が低めです:** アドリブに強い反面、計画性が不足しがち。締め切り直前で慌てないよう、タスク管理ツールを活用して「仕組み」でカバーしましょう。")
+        analysis.append("⚠️ **勤勉性が低めです:** アドリブに強い反面、計画性が不足しがち。タスク管理ツールで「仕組み」化しましょう。")
     if scores_norm["Neuroticism"] >= 4.0:
-        analysis.append("🧠 **感受性が非常に高いです:** 小さなミスや他人の言動を気にしすぎる傾向があります。「まあいいか」を口癖にし、意識的に鈍感になる練習が必要です。")
+        analysis.append("🧠 **感受性が高いです:** 小さなミスを気にしすぎる傾向があります。「まあいいか」を口癖に。")
     if scores_norm["Openness"] >= 4.0:
-        analysis.append("✨ **高い開放性:** 新しいもの好きで好奇心旺盛。ルーティンワークは苦痛になるため、常に新しい刺激がある環境に身を置くことが幸福の鍵です。")
+        analysis.append("✨ **高い開放性:** 新しいもの好きで好奇心旺盛。常に新しい刺激がある環境が幸福の鍵です。")
     
     # 2. 宿命とのギャップ分析
     warnings = []
     if fate_type_id in [0, 2, 6] and scores_norm["Extraversion"] < 2.5:
-        warnings.append("本来は人を引っ張る力を持っていますが、現在は少し自信を失って内向的になっているかもしれません。小さな成功体験を積み重ねて、本来の輝きを取り戻しましょう。")
+        warnings.append("本来は人を引っ張る力を持っていますが、現在は少し自信を失って内向的になっているかもしれません。")
     if fate_type_id in [1, 9] and scores_norm["Agreeableness"] < 2.5:
-        warnings.append("本来は人との和を大切にするタイプですが、現在は人間関係に疲れ、心を閉ざしている可能性があります。一人の時間を確保して、メンタルを回復させましょう。")
+        warnings.append("本来は協調性が高いタイプですが、現在は人間関係に疲れ、心を閉ざしている可能性があります。")
     if fate_type_id in [4, 7] and scores_norm["Conscientiousness"] < 2.5:
-        warnings.append("本来は独自のこだわりや安定感を持つ人ですが、現在は生活リズムが乱れているかもしれません。ルーティンを見直すことで運気が安定します。")
+        warnings.append("本来は堅実なこだわり屋ですが、現在は生活リズムが乱れているかもしれません。")
 
     return analysis, warnings
 
@@ -380,75 +369,88 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 6. Main UI Application (Tab Structure)
+# 5. Main UI Application (Mobile First)
 # ==========================================
 
-# サイドバー入力
-with st.sidebar:
-    st.title("🔮 Project MAP")
-    with st.expander("Step 1: 生年月日（必須）", expanded=True):
-        input_date = st.date_input("生年月日", value=datetime.date(1995, 1, 1), min_value=datetime.date(1900, 1, 1), max_value=datetime.date(2030, 12, 31))
-        input_time = st.selectbox("出生時間", ["不明", "00:00-01:59", "02:00-03:59", "etc"])
-        input_gender = st.selectbox("性別", ["回答しない", "男性", "女性", "その他"])
-    start_btn = st.button("診断する", type="primary")
+st.title("🔮 Project MAP")
 
-if start_btn:
-    engine = FortuneEngineIntegrated()
-    date_str = input_date.strftime("%Y/%m/%d")
-    result = engine.analyze_basic(date_str)
-    gan_id = result['gan']
-    content = DIAGNOSIS_CONTENT[gan_id]
-    fate_scores = result['scores']
+# タブによる大区分
+main_tab, catalog_tab = st.tabs(["📝 YOUR MAP (診断)", "📖 ALL TYPES (図鑑)"])
+
+# --- Tab 1: 診断 & 結果 ---
+with main_tab:
+    # ---------------------------
+    # A. 入力フォームエリア
+    # ---------------------------
+    st.markdown('<div class="stCard">', unsafe_allow_html=True)
+    st.markdown("### 1. 生年月日を入力")
     
-    # タブの定義
-    tab1, tab2, tab3 = st.tabs(["📜 宿命の地図", "🧬 科学的分析", "🚀 戦略レポート"])
-
-    # --- Tab 1: 宿命の地図 (Fortune View) ---
-    with tab1:
-        st.markdown('<div class="stCard">', unsafe_allow_html=True)
-        # 1. Title & Image
-        st.markdown(f"<div class='type-title'>{content['type_name']}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='hero-catch'>{content['catch_copy']}</div>", unsafe_allow_html=True)
-        
-        type_id = gan_id + 1
-        img_path, _ = load_image(type_id)
-        col_img1, col_img2, col_img3 = st.columns([1, 2, 1])
-        with col_img2:
-            if img_path: st.image(img_path, use_container_width=True)
-            else: st.image("https://placehold.co/400x400/f0f0f0/333?text=No+Image", use_container_width=True)
-        
-        st.markdown(f"<div style='text-align:center;'><span class='fate-chip'>FATE CODE: {result['fate_code']}</span></div>", unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # 2. Basic Description
-        st.markdown('<div class="stCard">', unsafe_allow_html=True)
-        st.markdown("#### 👤 あなたの本質")
-        st.write(content['desc'])
+    with st.form("diagnosis_form"):
+        # 日付入力のスマホ最適化（セレクトボックス横並び）
+        col_y, col_m, col_d = st.columns([1.2, 1, 1])
+        with col_y:
+            year = st.selectbox("年", list(range(1900, 2031)), index=95) # 1995デフォルト
+        with col_m:
+            month = st.selectbox("月", list(range(1, 13)), index=0)
+        with col_d:
+            day = st.selectbox("日", list(range(1, 32)), index=0)
+            
         st.markdown("---")
-        st.markdown(f"**❤️ 愛すべき欠点:** {content['flaw_desc']}")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # --- Tab 2: 科学的分析 (Science View) ---
-    with tab2:
-        st.info("👇 以下の10問に直感で答えると、科学的な性格分析グラフが追加されます。")
+        st.markdown("### 2. 性格診断 (任意)")
+        st.caption("直感で答えてください（1:違う 〜 7:そう思う）")
         
-        # Input Form
-        st.markdown('<div class="stCard">', unsafe_allow_html=True)
+        # TIPI-J スライダー (フォーム内配置)
         tipi_answers = {}
         for q_id, q_text in TIPI_QUESTIONS.items():
-            tipi_answers[q_id] = st.slider(f"{q_text}", 1, 7, 4, key=f"t2_{q_id}")
-        st.markdown('</div>', unsafe_allow_html=True)
+            tipi_answers[q_id] = st.slider(f"{q_text}", 1, 7, 4, key=f"form_{q_id}")
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("運命を診断する", type="primary", use_container_width=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        # Analysis Result
-        _, big5_norm = calculate_big5(tipi_answers)
-        analysis_text, warnings = analyze_big5(big5_norm, gan_id)
+    # ---------------------------
+    # B. 診断結果エリア (LP風表示)
+    # ---------------------------
+    if submitted:
+        # 日付の正当性チェック
+        try:
+            date_obj = datetime.date(year, month, day)
+            date_str = date_obj.strftime("%Y/%m/%d")
+            
+            # エンジン実行
+            engine = FortuneEngineIntegrated()
+            result = engine.analyze_basic(date_str)
+            gan_id = result['gan']
+            content = DIAGNOSIS_CONTENT[gan_id]
+            fate_scores = result['scores']
+            fate_code = result['fate_code']
+            
+            # Big Five 計算
+            _, big5_norm = calculate_big5(tipi_answers)
+            analysis_text, warnings = analyze_big5(big5_norm, gan_id)
 
-        # Dual Chart
-        st.markdown('<div class="custom-header">📊 宿命 vs 現在のギャップ</div>', unsafe_allow_html=True)
-        col_chart, col_text = st.columns([1, 1])
-        
-        with col_chart:
+            # === 1. Hero Section ===
             st.markdown('<div class="stCard">', unsafe_allow_html=True)
+            st.caption(f"FATE CODE: {fate_code}")
+            st.markdown(f"<div class='type-title'>{content['type_name']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='hero-catch'>{content['catch_copy']}</div>", unsafe_allow_html=True)
+            
+            # 画像表示
+            type_id = gan_id + 1
+            img_path, _ = load_image(type_id)
+            if img_path:
+                st.image(img_path, use_container_width=True)
+            else:
+                st.image("https://placehold.co/400x400/f0f0f0/333?text=No+Image", use_container_width=True)
+            
+            st.markdown(f"**Core Drive (欲求):** {content['desire']}")
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # === 2. Comparison Chart ===
+            st.markdown('<div class="mobile-header">📊 宿命 vs 現在</div>', unsafe_allow_html=True)
+            st.markdown('<div class="stCard">', unsafe_allow_html=True)
+            
             categories = ['Identity/外向', 'Create/開放', 'Economy/協調', 'Status/勤勉', 'Vitality/安定']
             fate_vals = [fate_scores['Identity'], fate_scores['Create'], fate_scores['Economy'], fate_scores['Status'], fate_scores['Vitality']]
             science_vals = [big5_norm['Extraversion'], big5_norm['Openness'], big5_norm['Agreeableness'], big5_norm['Conscientiousness'], 6 - big5_norm['Neuroticism']]
@@ -458,9 +460,25 @@ if start_btn:
             fig.add_trace(go.Scatterpolar(r=science_vals, theta=categories, fill='toself', name='Science(現在)', line_color='#2962ff', opacity=0.5))
             fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), showlegend=True, margin=dict(t=20, b=20, l=40, r=40), height=300)
             st.plotly_chart(fig, use_container_width=True)
+            st.caption("緑: 生まれ持った資質 / 青: 現在の性格")
             st.markdown('</div>', unsafe_allow_html=True)
+
+            # === 3. Report Section ===
+            st.markdown('<div class="mobile-header">📜 運命の解説</div>', unsafe_allow_html=True)
             
-        with col_text:
+            st.markdown('<div class="stCard">', unsafe_allow_html=True)
+            st.markdown("#### 👤 基本性格")
+            st.write(content['desc'])
+            st.markdown("---")
+            st.markdown(f"#### ⚔️ {content['work_style_title']}")
+            st.write(content['work'])
+            st.markdown("---")
+            st.markdown("#### 💖 恋愛スタイル")
+            st.write(content['love'])
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # === 4. Science Report ===
+            st.markdown('<div class="mobile-header">🧬 科学的分析</div>', unsafe_allow_html=True)
             st.markdown('<div class="stCard">', unsafe_allow_html=True)
             st.write(analysis_text)
             if warnings:
@@ -469,45 +487,46 @@ if start_btn:
                 for w in warnings: st.write(f"- {w}")
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Tab 3: 戦略レポート (Strategy View) ---
-    with tab3:
-        st.markdown('<div class="custom-header">💼 Work & Love Strategy</div>', unsafe_allow_html=True)
-        
-        col_w, col_l = st.columns(2)
-        with col_w:
+            # === 5. Compatibility & CTA ===
+            st.markdown('<div class="mobile-header">💞 運命の相性</div>', unsafe_allow_html=True)
             st.markdown('<div class="stCard">', unsafe_allow_html=True)
-            st.markdown(f"#### ⚔️ {content['work_style_title']}")
-            st.write(content['work'])
-            st.markdown('</div>', unsafe_allow_html=True)
-        with col_l:
-            st.markdown('<div class="stCard">', unsafe_allow_html=True)
-            st.markdown("#### 💖 恋愛・パートナーシップ")
-            st.write(content['love'])
+            partners = result['partners']
+            st.success(f"🥇 1位: {partners[0]}")
+            st.info(f"🥈 2位: {partners[1]}")
+            st.info(f"🥉 3位: {partners[2]}")
             st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="stCard">', unsafe_allow_html=True)
-        st.markdown("#### 💞 運命の相性 Best 3")
-        for i, p in enumerate(result['partners']):
-            st.success(f"**{i+1}位** {p}")
-        st.markdown('</div>', unsafe_allow_html=True)
+            # 寸止めエリア
+            st.markdown('<div class="stCard" style="border: 2px solid #00c853;">', unsafe_allow_html=True)
+            st.markdown("### 🔒 完全版レポート（無料）")
+            st.markdown('<div class="blur-container">', unsafe_allow_html=True)
+            st.write("コミュニケーションの癖 / ストレス反応 / 科学的ソリューション...")
+            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.link_button("🔑 LINEで完全版を受け取る", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        # CTA
-        st.markdown('<div class="stCard" style="border: 2px solid #00c853;">', unsafe_allow_html=True)
-        st.markdown("### 🔒 完全版レポート（無料）")
-        st.markdown('<div class="blur-container">', unsafe_allow_html=True)
-        st.write("#### ④ コミュニケーションの癖 / ⑤ ストレス時の反応 / ⑥ 科学的ソリューション")
-        st.write("ここにあなたの人生を変える具体的な行動指針が表示されます...")
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.link_button("🔑 LINEで完全版を受け取る", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        except ValueError:
+            st.error("存在しない日付です。正しい日付を選択してください。")
 
-else:
-    # 待機画面
-    st.info("👈 サイドバーから生年月日を入力して「診断する」を押してください。")
-    st.markdown("""
-    <div style="text-align: center; padding: 50px; color: #666;">
-        <h2>Project MAP</h2>
-        <p>Science x Fortune Telling</p>
-    </div>
-    """, unsafe_allow_html=True)
+# --- Tab 2: 全タイプ図鑑 ---
+with catalog_tab:
+    st.markdown("### 📖 全10タイプ図鑑")
+    st.markdown("タップして詳細を確認できます")
+    
+    # 2カラムでカード表示
+    cols = st.columns(2)
+    for i in range(10):
+        c = DIAGNOSIS_CONTENT[i]
+        type_id = i + 1
+        with cols[i % 2]:
+            st.markdown('<div class="stCard" style="padding:10px;">', unsafe_allow_html=True)
+            img_path, _ = load_image(type_id)
+            if img_path:
+                st.image(img_path, use_container_width=True)
+            else:
+                st.image("https://placehold.co/200x200/f0f0f0/333?text=No+Image", use_container_width=True)
+            
+            st.markdown(f"**{c['type_name']}**")
+            st.caption(c['catch_copy'].replace("\n", " "))
+            st.markdown('</div>', unsafe_allow_html=True)
