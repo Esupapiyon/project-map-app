@@ -6,105 +6,143 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Clean & Impactful)
+# 1. Page Config & CSS (Reading Mode)
 # ==========================================
 st.set_page_config(
-    page_title="Project MAP",
+    page_title="Project MAP | 性格の解剖図鑑",
     page_icon=None,
-    layout="centered",
+    layout="centered", # 長文は中央寄せが読みやすい
     initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-    /* 全体設定: 高級感のある白ベース */
+    /* ベーススタイル：読み物としての最適化 */
     .stApp {
         background-color: #FFFFFF;
-        color: #333333;
+        color: #2c3e50;
         font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-        line-height: 1.8; /* 長文を読みやすく */
+        line-height: 1.9; /* 行間を広く取って読みやすく */
+        letter-spacing: 0.03em;
     }
     
     /* カードデザイン */
-    .result-card {
-        background-color: #FAFAFA;
+    .read-card {
+        background-color: #FFFFFF;
         padding: 32px 24px;
-        border-radius: 16px;
-        border: 1px solid #EEEEEE;
-        margin-bottom: 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border: 1px solid #F0F0F0;
+        margin-bottom: 40px;
     }
     
-    /* 強調ハイライト（黄色マーカー風） */
-    .highlight {
-        background: linear-gradient(transparent 60%, #FFF176 60%);
-        font-weight: bold;
-        padding: 0 4px;
+    /* 見出しスタイル */
+    h3 {
+        font-size: 1.4rem !important;
+        font-weight: 800 !important;
+        color: #111 !important;
+        margin-top: 40px !important;
+        margin-bottom: 20px !important;
+        border-bottom: 2px solid #00C853;
+        display: inline-block;
+        padding-bottom: 5px;
+    }
+    
+    h4 {
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+        color: #555 !important;
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
     }
 
-    /* アイデンティティエリア */
-    .identity-header {
+    /* アイデンティティヘッダー */
+    .type-header {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
-    .type-label {
+    .type-sub {
         font-size: 0.9rem;
-        font-weight: 700;
-        color: #BDBDBD;
-        letter-spacing: 0.1em;
+        color: #999;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
+        margin-bottom: 5px;
     }
-    .type-name {
-        font-size: 2.0rem;
+    .type-main {
+        font-size: 2.2rem;
         font-weight: 900;
-        color: #212121;
-        margin: 10px 0;
-        line-height: 1.3;
+        color: #222;
+        line-height: 1.2;
+        margin-bottom: 15px;
     }
-    .catch-copy {
+    .hero-copy {
         font-size: 1.1rem;
         font-weight: 600;
-        color: #00C853; /* アクセントカラー */
+        color: #00C853;
         margin-bottom: 20px;
     }
-    
-    /* テキストセクション見出し */
-    .text-label {
-        font-size: 1.0rem;
-        font-weight: 800;
-        color: #424242;
-        border-left: 4px solid #00C853;
-        padding-left: 10px;
-        margin-top: 30px;
-        margin-bottom: 10px;
+
+    /* あるあるリスト（トリビア） */
+    .trivia-box {
+        background-color: #F9F9F9;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #aaa;
     }
-    
-    /* 引用風ボックス（Golden Rule用） */
-    .quote-box {
-        background-color: #E8F5E9;
-        border-left: 5px solid #00C853;
-        padding: 15px;
-        border-radius: 4px;
+    .trivia-item {
+        font-size: 1.0rem;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: start;
+    }
+    .trivia-icon {
+        color: #00C853;
+        margin-right: 10px;
         font-weight: bold;
-        color: #2E7D32;
-        margin: 20px 0;
     }
 
-    /* CTAエリア */
-    .cta-box {
-        background-color: #212121;
+    /* 処方箋（Golden Rule） */
+    .prescription-box {
+        background: linear-gradient(135deg, #00C853 0%, #009624 100%);
         color: white;
         padding: 30px;
         border-radius: 12px;
-        text-align: center;
         margin-top: 40px;
+        text-align: center;
+    }
+    .rule-title {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+    .rule-text {
+        font-size: 1.3rem;
+        font-weight: 800;
+        margin-bottom: 15px;
     }
     
-    /* ぼかし */
-    .blurred {
-        filter: blur(5px);
-        opacity: 0.7;
+    /* ぼかし＆ロック */
+    .blurred-content {
+        filter: blur(8px);
+        opacity: 0.5;
         pointer-events: none;
         user-select: none;
+    }
+    .lock-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        text-align: center;
+        z-index: 10;
+    }
+    .lock-card {
+        background: rgba(255,255,255,0.95);
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -113,7 +151,7 @@ st.markdown("""
 # 2. Helper Functions
 # ==========================================
 def load_image(type_id):
-    """画像のパスを柔軟に探す（8と9の入れ替えロジック含む）"""
+    """画像パス探索（8と9の入れ替えロジック維持）"""
     target_id = type_id
     if type_id == 8: target_id = 9
     elif type_id == 9: target_id = 8
@@ -122,17 +160,16 @@ def load_image(type_id):
     base_dir = "images"
     
     if not os.path.exists(base_dir): return None
-    
     for ext in extensions:
-        filename = f"{target_id}{ext}"
-        path = os.path.join(base_dir, filename)
+        path = os.path.join(base_dir, f"{target_id}{ext}")
         if os.path.exists(path): return path
     return None
 
 # ==========================================
-# 3. Logic Data & Content Expansion
+# 3. Logic Data (Part A: Type 1-5)
 # ==========================================
 
+# TIPI-J 質問項目（変更なし）
 TIPI_QUESTIONS = {
     "Q1": "活発で、外向的だと思う", "Q2": "他人に不満をもち、もめごとを起こしやすいと思う",
     "Q3": "しっかりしていて、自分に厳しいと思う", "Q4": "心配性で、うろたえやすいと思う",
@@ -141,144 +178,173 @@ TIPI_QUESTIONS = {
     "Q9": "冷静で、気分が安定していると思う", "Q10": "発想力に欠けた、平凡な人間だと思う"
 }
 
-# 全タイプ共通のCTAテキスト
-COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
-
+# 診断コンテンツ（前半：Type 1 - Type 5）
 DIAGNOSIS_CONTENT = {
-    0: { # Type 1: 甲
+    0: { # Type 1: 甲 (THE LEADER)
         "name": "頼れる親分肌 (THE LEADER)",
         "catch": "折れない信念を持つ、孤高の統率者",
-        "desc": "あなたは、漫画の主人公のような真っ直ぐな正義感を持つリーダーです。混乱した状況でも「私がやる」と声を上げる強さがありますが、**実は一人になると急に冷めて孤独を感じていませんか？**（アンビバレンス）。最近、何もないところで躓いたり、ちょっとしたルール違反に過剰にイライラしたはずです（ショットガン）。あなたは理解されにくい「ガラスの巨塔」ですが、その脆さこそが、誰も到達できない高みを目指す**王の証**なのです（レアリティ）。",
-        "flaw": "【融通ゼロの繊細ゴリラ】\n一度折れると再起不能になるほど落ち込みます。しかしそれは、「妥協」という言葉が辞書にないほど、理想が高潔であることの裏返しです。",
-        "desire": "尊敬・成長",
-        "habit": "結論ファースト。既読無視は「了解」の合図。議論になると正論というナイフで相手をタコ殴りにしてしまう。",
-        "shadow": "【過剰な批判者化】\nストレスが限界を超えると、周囲を攻撃し始めます。でもそれは、あなたが誰よりも責任を感じ、一人で背負い込んでいる証拠なのです（バリデーション）。",
-        "golden_rule": "『負けるが勝ち』を覚えよ",
-        "cta_text": COMMON_CTA
+        "intro": "あなたには、生まれながらにして人々を惹きつけ、自然と集団の中心に立ってしまう引力があります。それは単なる明るさではなく、「この人は何かを変えてくれるかもしれない」と他人に予感させる、圧倒的な頼もしさと威厳です。大樹が大地に根を張るように、あなたは揺るぎない自分軸を持っており、混沌とした状況においてこそ、その存在感は際立ちます。しかし、その真っ直ぐすぎる姿勢は、時に周囲に「近寄りがたい」という緊張感を与えているかもしれません。",
+        "social_style": "【対人スタイル：守護と支配】\nあなたは「身内」と認定した人間に対しては、海よりも深い愛情と責任感で守り抜きます。部下のミスを被ったり、友人の窮地には損得抜きで駆けつける親分肌です。しかし、その反面、自分の価値観やルールに反する人間に対しては容赦がありません。「無能」「不誠実」と判断した相手には、氷のように冷徹な態度を取り、心のシャッターを完全に下ろします。議論においては、感情論を嫌い、正論という名の凶器で相手を黙らせてしまう傾向があり、勝っても「孤独」を感じることがあるでしょう。",
+        "inner_drive": "【本音と欠点：完全への渇望】\nあなたがこれほどまでに強く振る舞うのは、実は心の奥底に「混沌」や「無秩序」に対する根源的な恐怖があるからです。「自分がしっかりしなければ崩壊する」という強迫観念にも似た責任感が、あなたを突き動かしています。\n愛すべき欠点は、その「不器用なほどの融通の利かなさ」です。誰もが適当に流すような小さな不正義も許せず、一人でカリカリしてしまう姿は、周囲からは「面倒くさいけれど、信頼できる人」として愛されています。",
+        "shadow_phase": "【ストレス反応：孤立する暴君】\n精神的な余裕を失うと、あなたは「どうして誰も私のレベルで動けないんだ」と周囲を断罪し始めます。完璧主義が暴走し、他人の些細な欠点をあげつらったり、独善的な命令を下したりして、自ら孤立を深めていきます。最終的には「もう全部一人でやる」と殻に閉じこもり、心身ともに燃え尽きるまで走り続けてしまう危険性があります。",
+        "trivia": [
+            "歩くのが遅い人の後ろにいると、露骨にイライラしてしまう",
+            "「とりあえず」という言葉が大嫌い",
+            "曲がったネクタイや、整っていない資料を見ると直したくて手が震える",
+            "実は涙もろいが、人前では絶対に泣かないと決めている",
+            "誰も見ていないところでも、赤信号は絶対に渡らない"
+        ],
+        "golden_rule_long": "『負けるが勝ち』を、戦略としてインストールせよ。\nあなたの正しさは誰もが認めています。だからこそ、あえて相手に花を持たせ、頭を下げる「演技」を覚えたとき、あなたは単なる実力者から、誰もが心服する真の王になります。"
     },
-    1: { # Type 2: 乙
+    1: { # Type 2: 乙 (THE CONNECTOR)
         "name": "愛され調整役 (THE CONNECTOR)",
         "catch": "したたかに生き残る、柔軟な戦略家",
-        "desc": "あなたはどんな過酷な環境でも、笑顔で生き残る雑草魂を持っています。ニコニコしていますが、**頭の中では常に電卓を叩いて損得勘定をしていますよね？**（アンビバレンス）。最近、興味のない話に笑顔で相槌を打ちながら、「今日の晩御飯なにしよう」と考えていましたね？（ショットガン）。あなたは単なる八方美人ではありません。剛腕リーダーをも裏で操る、真の**「影の支配者」**という才能の持ち主です（レアリティ）。",
-        "flaw": "【自分を見失うカメレオン】\n人に合わせすぎて「で、本音は？」と聞かれるとフリーズします。しかしそれは、どんな器にも入れる水のような柔軟性を持っている証拠です。",
-        "desire": "調和・安全",
-        "habit": "傾聴の天才。相手の仕草を真似るミラーリングが得意。LINEでは相手の文量やスタンプに合わせる。",
-        "shadow": "【依存と責任転嫁】\n「あの人が言ったから」と逃げたくなる時があります。それは、あなたが常に全体の調和を優先し、板挟みになって戦っているからです（バリデーション）。",
-        "golden_rule": "『嫌われる勇気』を持て",
-        "cta_text": COMMON_CTA
+        "desc": "省略", # 互換性のため
+        "intro": "あなたは、コンクリートの隙間からでも花を咲かせる草花のように、どんな過酷な環境でも生き残る「生存戦略の天才」です。決して声高に自己主張するわけではありませんが、気づけばキーマンの隣に座り、最も居心地の良いポジションを確保している。そんな「柔よく剛を制す」しなやかさがあなたの武器です。一見、無害で人当たりの良い人物に見えますが、その笑顔の裏には、周囲のパワーバランスを冷静に見極める計算高い瞳が隠されています。",
+        "social_style": "【対人スタイル：全方位外交と依存】\nあなたは「敵を作らない」ことにかけては世界一の才能を持っています。相手によって声のトーンや話題を瞬時に変え、誰とでも心地よい関係を築くカメレオンのような社交術を持っています。\nしかし、それは「嫌われたくない」という防衛本能の裏返しでもあります。決断を迫られると「私はどっちでもいいよ」と判断を相手に委ね、責任を回避する傾向があります。集団の調和を乱すまいとするあまり、八方美人になりすぎて、信用を失うリスクを常に抱えています。",
+        "inner_drive": "【本音と欠点：孤独への恐怖】\nあなたがこれほどまでに空気を読むのは、集団から弾き出されることへの強烈な恐怖があるからです。「一人では生きていけない」と本能的に悟っており、常に誰かと繋がっていることで安心感を得ようとします。\n愛すべき欠点は、その「わかりやすすぎる計算高さ」です。メリットのある人には尻尾を振るのに、どうでもいい人には少し雑になる。その人間臭い現金さが、逆に「憎めないキャラ」として定着しています。",
+        "shadow_phase": "【ストレス反応：悲劇のヒロイン】\n追い詰められると、急に被害者面をして責任転嫁を始めます。「あの人が言ったから」「私は悪くないのに」と周囲に吹聴し、同情を買うことで自分を守ろうとします。また、強いものに巻かれる傾向が強まり、自分の意思を完全に放棄して、操り人形のように振る舞うことで思考停止しようとします。",
+        "trivia": [
+            "興味のない話でも、笑顔で「すごーい！」と言える",
+            "LINEの返信スタンプを選ぶのに3分悩むことがある",
+            "「何食べたい？」と聞かれるのが死ぬほど苦手",
+            "強い人の意見には、とりあえず0.5秒で同意する",
+            "一人焼肉や一人映画には、実は行けない（寂しいから）"
+        ],
+        "golden_rule_long": "『嫌われる勇気』が、最強の鎧になる。\n全員に好かれようとすることは、誰からも信頼されないことと同義です。10人のうち2人に嫌われても、自分の意志をはっきり示すことで、残りの8人との絆は、単なる「馴れ合い」を超えた本物の信頼へと変わります。"
     },
-    2: { # Type 3: 丙
+    2: { # Type 3: 丙 (THE PROTAGONIST)
         "name": "天性の主人公 (THE PROTAGONIST)",
         "catch": "世界を照らす、あくなき挑戦者",
-        "desc": "あなたは歩く火力発電所です。その場にいるだけで照明が明るくなったと錯覚させるエネルギーがありますが、**家に帰った瞬間、電池が切れたように無表情になりますよね？**（アンビバレンス）。最近、スマホをどこに置いたか忘れたり、買ったばかりの物を失くしたりしませんでしたか？（ショットガン）。あなたは落ち着きのない子供のようですが、その「根拠のない自信」こそが、世界を変える**規格外のエンジン**なのです（レアリティ）。",
-        "flaw": "【話を聞かないジャイアン】\n秘密を3秒で拡散してしまいます。しかしそれは、情報を独り占めせず、世界にオープンにするという圧倒的な陽のエネルギーの表れです。",
-        "desire": "注目・称賛",
-        "habit": "マシンガントーク。LINEは短文連投型。沈黙が怖くて喋り続けてしまう。",
-        "shadow": "【極端な無気力】\n急に「もうダメだ」と大騒ぎします。それは、あなたが普段、常人の3倍のエネルギーで周りを照らし続けている反動なのです（バリデーション）。",
-        "golden_rule": "『継続』こそが最大のエンタメ",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、真夏の太陽のように強烈な光と熱を放つ、天性のエンターテイナーです。あなたが部屋に入ってきた瞬間、場の空気がパッと明るくなるような、不思議なオーラを纏っています。論理よりも感情、計画よりも情熱。「なんとかなるさ！」という根拠のない自信で周囲を巻き込み、いつの間にか皆をあなたのペースに乗せてしまう。良くも悪くも、世界はあなた中心に回っていると言っても過言ではありません。",
+        "social_style": "【対人スタイル：巻き込み型カリスマ】\n誰に対してもオープンマインドで、裏表のない性格は多くの人を惹きつけます。沈んでいる人を強引に外へ連れ出し、豪快に笑い飛ばして元気づけるような、圧倒的な陽のエネルギーを持っています。\n一方で、自分の話をするのが大好きで、相手の話を聞いているようで聞いていない「ジャイアン」的な側面も。しかし、その自己中心性すらも「まあ、あの人だから仕方ないか」と許させてしまう愛嬌こそが、あなたの最大の武器です。",
+        "inner_drive": "【本音と欠点：承認への渇望】\nあなたの行動の原動力は、シンプルに「見てほしい」「褒めてほしい」という承認欲求です。注目されないことは、あなたにとって存在していないも同然です。\n愛すべき欠点は、その「驚くべき飽きっぽさ」です。昨日まで「一生の趣味にする！」と熱中していた道具が、今日はもう部屋の隅で埃を被っている。その子供のような移り気さは、周囲を呆れさせつつも、常に新しい風を運んできます。",
+        "shadow_phase": "【ストレス反応：極端な無気力】\n普段の明るさが嘘のように、電池が切れたように落ち込みます。「もうダメだ、終わった」と大げさに騒ぎ立てますが、それは「そんなことないよ」と慰めてほしいサインでもあります。批判されると過剰に反応し、一時的に攻撃的になりますが、一晩寝ると忘れていることが多いのも特徴です。",
+        "trivia": [
+            "スマホの充電が20%を切ると、パニックになる",
+            "秘密の話を「ここだけの話」として3人に喋ったことがある",
+            "褒められると、顔に出るのを隠しきれない",
+            "長文の説明書は、最初の3行しか読まない",
+            "買ったばかりの服を、その日に着て帰る"
+        ],
+        "golden_rule_long": "『継続』こそが、最大のエンターテインメント。\nあなたの爆発力は最強ですが、持続力がありません。飽きてからが本当の勝負。「あと一歩」踏ん張るだけで、あなたは単なる「一発屋」ではなく、時代を作る「レジェンド」になれます。"
     },
-    3: { # Type 4: 丁
+    3: { # Type 4: 丁 (THE MUSE)
         "name": "熱き夢想家 (THE MUSE)",
         "catch": "静寂に燃える、知性の灯火",
-        "desc": "あなたは一見穏やかで物静かですが、内側にはドロドロとした情熱と、**過去10年分の恨みを記録したデスノート**を持っていますね？（アンビバレンス）。最近、夜中にふと人生について考え込み、ポエムのような長文を下書き保存しませんでしたか？（ショットガン）。あなたは理解されにくいミステリアスな存在ですが、その「狂気」に近い感受性こそが、芸術を生み出す**天才の源泉**です（レアリティ）。",
-        "flaw": "【察してちゃん界のラスボス】\n言葉にせず「わかってよ」オーラを出します。しかしそれは、言葉では表現しきれないほど繊細で高解像度な世界を見ているからです。",
-        "desire": "理解・美学",
-        "habit": "核心を突く一言で場を凍らせる。深夜になるとLINEが長文化し、哲学的な内容を送りがち。",
-        "shadow": "【疑心暗鬼と攻撃】\n「あの人は私を馬鹿にしている」と思い込みます。それは、あなたの洞察力が鋭すぎて、他人の微細な悪意まで感知してしまうからです（バリデーション）。",
-        "golden_rule": "『言葉にする』手間を惜しむな",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、夜空に浮かぶ月や、暗闇で揺れる蝋燭の炎のように、静かでミステリアスな引力を持つ人です。大声で自己主張することはありませんが、その内側には、誰よりも激しい情熱と、鋭い反骨精神、そして独自の美学が渦巻いています。多くの人が見過ごすような些細な変化や、言葉の裏にある感情を読み取る洞察力を持ち、組織においては「静かなる参謀」や「孤高のクリエイター」として一目置かれる存在です。",
+        "social_style": "【対人スタイル：狭く深く、濃密に】\nあなたは「量」より「質」の人間関係を求めます。表面的な付き合いや、中身のない世間話は時間の無駄だと感じています。心を許した少数の相手とは、夜通し人生や哲学について語り合うような濃密な関係を築きます。\n一方で、一度「敵」とみなした相手には、表向きは穏やかに接しながらも、心の中で静かにシャッターを下ろし、永久にアクセス禁止にする冷徹さを持っています。",
+        "inner_drive": "【本音と欠点：理解への渇望】\nあなたが最も恐れているのは「ありきたりな人間だと思われること」です。「変わってるね」はあなたにとって最高の褒め言葉です。\n愛すべき欠点は、めんどくさいほどの「察してちゃん」気質。「言わなくてもわかってよ」というオーラを出し、相手が気づかないと勝手に傷ついて殻に閉じこもる。その繊細で手のかかる部分は、理解者にとってはたまらない魅力となります。",
+        "shadow_phase": "【ストレス反応：疑心暗鬼と攻撃】\nストレスが極限に達すると、被害妄想が膨らみます。「あの人のあの一言は、私への当てつけに違いない」とネガティブな深読みをし、周囲を敵視します。また、溜め込んだ感情が爆発すると、過去の恨みつらみを理路整然と並べ立て、相手を精神的に追い詰める怖さがあります。",
+        "trivia": [
+            "深夜に書いたポエムのようなLINEを、翌朝消したくなる",
+            "「普通」と言われると、密かに傷つく",
+            "人の好き嫌いは激しいが、顔には出さない",
+            "10年前に言われた嫌な一言を、一字一句覚えている",
+            "占いや心理テストの結果を、こっそり信じている"
+        ],
+        "golden_rule_long": "『言葉にする』手間を、惜しんではならない。\nあなたの繊細な感性は素晴らしいですが、テレパシーは使えません。察してほしいと願う前に、泥臭く言葉で伝える努力をすることで、あなたの孤独な世界は、多くの人に愛される共感の庭になります。"
     },
-    4: { # Type 5: 戊
+    4: { # Type 5: 戊 (THE ANCHOR)
         "name": "不動の守護神 (THE ANCHOR)",
         "catch": "すべてを受け入れる、揺るがぬ巨塔",
-        "desc": "あなたは何があっても動じない人間岩盤です。周囲からは「器が大きい」と頼られていますが、**実は単に動くのが面倒くさいだけだったりしますよね？**（アンビバレンス）。最近、お気に入りの店がメニューを変えただけで、一日中不機嫌になりませんでしたか？（ショットガン）。その頑固さは短所ではありません。嵐の中でも一歩も引かない、組織の**「絶対的なアンカー（錨）」**という才能です（レアリティ）。",
-        "flaw": "【テコでも動かない頑固オヤジ】\n変化を極端に嫌います。しかしそれは、一度築き上げたものを死守し、永続させるための鉄壁の防御力なのです。",
-        "desire": "安定・信頼",
-        "habit": "基本は聞き役。LINEの返信は遅く、「了解」の一言などシンプル極まりない。",
-        "shadow": "【完全な閉鎖】\n殻に閉じこもり、誰の言葉も届かなくなります。それは、あなたが「最後の砦」として、一人で重圧に耐えようとしているからです（バリデーション）。",
-        "golden_rule": "『とりあえずやってみる』精神を持て",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、雄大な山のように、そこに存在するだけで周囲に安心感を与える「器の大きい」人物です。細かいことには動じず、来るもの拒まずの姿勢で、清濁併せ呑む包容力を持っています。自分からガツガツ動くことは少ないですが、どっしりと構えているだけで自然と人やお金が集まってくる、生まれながらの「社長・オーナー」のような風格を漂わせています。",
+        "social_style": "【対人スタイル：受け身の信頼】\nあなたは基本的に「聞き役」です。相談事をされると、ただ「うんうん」と頷いているだけで、相手が勝手に癒やされ、解決した気になって帰っていくような不思議な力があります。\nしかし、自分のテリトリーやペースを乱されることを極端に嫌います。普段は温厚ですが、自分の流儀を強引に変えようとする相手には、テコでも動かない頑固さで対抗し、無言の圧力で撃退します。",
+        "inner_drive": "【本音と欠点：変化への恐怖】\nあなたの安定感の裏には、「変わることへの面倒くささ」や「現状維持への執着」があります。リスクを冒して新しいことに挑戦するよりは、今の確実な利益を守りたいというのが本音です。\n愛すべき欠点は、その「腰の重さ」です。周りが「早くして！」と焦っていても、あなただけワンテンポ遅れて動いている。そのマイペースさは、時として周囲をイライラさせますが、パニック時には最強の安定剤となります。",
+        "shadow_phase": "【ストレス反応：完全な閉鎖】\n許容量を超えると、あなたは外界との接触を完全に遮断します。殻に閉じこもり、電話にも出ず、誰の言葉も耳に入らなくなります。それは、あなたが「最後の砦」として一人ですべてを抱え込みすぎた反動であり、動かざる山が噴火する前兆でもあります。",
+        "trivia": [
+            "お気に入りの店がメニューを変えると、一日中不機嫌になる",
+            "LINEの返信は「了解」の一言か、スタンプのみ",
+            "貯金通帳の数字が増えるのを見るのが、密かな楽しみ",
+            "動き出すまでに時間がかかるが、一度動くと止まらない",
+            "「昔は良かった」と、つい口にしてしまう"
+        ],
+        "golden_rule_long": "『とりあえずやってみる』精神を、意図的に持て。\nあなたの慎重さは武器ですが、時には足枷になります。考えすぎる前に、まず靴を履いて外に出る。その一歩の軽やかさを身につければ、あなたの圧倒的な実力は、さらに広い世界で輝きます。"
     },
-    5: { # Type 6: 己
+    5: { # Type 6: 己 (THE NURTURER)
         "name": "尽くす世話焼き (THE NURTURER)",
         "catch": "才ある者を育む、慈愛の大地",
-        "desc": "あなたは困っている人を放っておけない「みんなのオカン」です。無償の愛を注いでいるつもりですが、**心のどこかで「これだけやったんだから感謝してよ」と見返りを求めていますよね？**（アンビバレンス）。最近、ダメな異性や手のかかる後輩ばかり構ってしまっていませんか？（ショットガン）。あなたはただのお人好しではありません。原石を見抜き、磨き上げる**「最強の育成者」**という特別な才覚を持っています（レアリティ）。",
-        "flaw": "【ダメンズ製造機】\n世話を焼きすぎて相手の自立心を奪います。しかしそれは、相手の可能性を信じ抜くことができる、深すぎる愛情の裏返しです。",
-        "desire": "貢献・親密",
-        "habit": "話し方が教育的。LINEは長文で、日常の写真や「ご飯食べた？」などの確認が多い。",
-        "shadow": "【愚痴と干渉】\n「あんなにしてあげたのに」と不満が爆発します。それは、あなたが自分のこと以上に他人のために命を削って尽くしてきた証拠です（バリデーション）。",
-        "golden_rule": "『手放す愛』を知れ",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、豊かな土壌が作物を育てるように、他人の才能を見抜き、慈しみ、開花させる天性の「育成者」です。困っている人を見ると放っておけず、つい手を差し伸べてしまう母性的な優しさを持っています。自分自身が脚光を浴びることよりも、あなたが育てた誰かが成功し、輝く姿を見ることに無上の喜びを感じる、究極のサポーター気質と言えるでしょう。",
+        "social_style": "【対人スタイル：過干渉な愛】\n「大丈夫？」「ご飯食べた？」と、常に周囲を気にかけるあなたの周りには、自然と人が集まります。複雑なことを噛み砕いて教えるのが上手く、チームの教育係や相談役として絶大な信頼を得ます。\nしかし、その愛は時として「重たい」ものになりがちです。良かれと思って先回りしすぎたり、相手の課題まで肩代わりしてしまったりすることで、無意識のうちに相手の自立心を奪い、「あなたなしでは生きられない人（ダメンズ）」を量産してしまう傾向があります。",
+        "inner_drive": "【本音と欠点：感謝への渇望】\nあなたの献身の裏には、「必要とされたい」という強い承認欲求があります。「誰かの役に立っている」という実感が、あなたのアイデンティティそのものなのです。\n愛すべき欠点は、見返りがないと途端に不機嫌になる「恩着せがましさ」です。「あんなにしてあげたのに」と過去の献身を持ち出して愚痴をこぼす姿は、人間臭くもあり、あなたの愛がいかに情熱的であったかの証明でもあります。",
+        "shadow_phase": "【ストレス反応：愚痴と干渉】\n精神的に追い詰められると、視野が狭くなり、細かいことへの干渉が激しくなります。「私の言う通りにすればいいのよ」と相手をコントロールしようとしたり、周囲への不満や愚痴が止まらなくなったりします。愛が執着へと変わり、泥沼化する前に距離を置く必要があります。",
+        "trivia": [
+            "バッグの中に、絆創膏や常備薬が必ず入っている",
+            "ダメな異性ほど、可愛く見えて放っておけない",
+            "教え方が上手いと言われると、最高に嬉しい",
+            "サプライズをするのは好きだが、されるとリアクションに困る",
+            "「私がいないとダメね」と言いながら、実は嬉しそう"
+        ],
+        "golden_rule_long": "『手放す愛』を、勇気を持って知れ。\n手を貸すことだけが愛ではありません。時には突き放し、転ぶのを見守る勇気を持つこと。相手の力を信じて「何もしない」という選択ができた時、あなたは依存関係を超えた、真の教育者へと進化します。"
     },
-    6: { # Type 7: 庚
+    6: { # Type 7: 庚 (THE HERO)
         "name": "正義の切り込み隊長 (THE HERO)",
         "catch": "時代を切り拓く、鋼の革命家",
-        "desc": "あなたは「それはおかしい」と声を上げられる特攻隊長です。サッパリしていますが、**デリカシーがなく、悪気なく正論で人を傷つけて、後で「言い過ぎたかな…」と1ミリだけ反省しますよね？**（アンビバレンス）。最近、結論の出ない会議にイライラして、貧乏ゆすりが止まらなくなりませんでしたか？（ショットガン）。その攻撃性は、停滞した世界をぶち壊すための**「聖なる剣」**です（レアリティ）。",
-        "flaw": "【デリカシー？何それ美味しいの？】\n空気を読みません。しかしそれは、同調圧力に屈せず、雑音に惑わされずに「真実」だけを見抜く力が強すぎるのです。",
-        "desire": "変革・勝利",
-        "habit": "単刀直入。前置きなしで本題に入る。LINEは「うん」「わかった」「NG」の即レス。",
-        "shadow": "【破壊的衝動】\n全てをリセットしたくなります。それは、あなたが妥協だらけの現実に絶望せず、理想を追い求め続けている戦士だからです（バリデーション）。",
-        "golden_rule": "『剣を収める』美学を持て",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、切れ味鋭い日本刀のように、停滞した空気を一撃で切り裂く「変革者」です。「長いものに巻かれる」という発想が皆無で、誰もが言いにくいことでも「それはおかしい」と堂々と声を上げる強さを持っています。そのスピード感と決断力は、硬直した組織や古い慣習を打ち破るための、最強の武器となります。敵も作りますが、それ以上に熱狂的な信者を生むカリスマです。",
+        "social_style": "【対人スタイル：直球勝負】\n嘘や駆け引きが大嫌いで、常に本音でぶつかります。結論のないダラダラした会話には露骨に退屈な顔をし、「で、結論は？」と急かしてしまうことも。\nあなたの言葉には裏表がないため、サッパリとした気持ちの良い付き合いができますが、デリカシーのなさも天下一品です。悪気なく相手の痛いところを突き、場を凍らせてから「あれ、言い過ぎた？」と気づく、不器用な愛嬌があります。",
+        "inner_drive": "【本音と欠点：闘争本能】\nあなたが戦うのは、単に攻撃的だからではなく、「より良い世界（正解）」への純粋な希求があるからです。現状維持は後退と同じだと考えており、常に前進し、勝利することを求めています。\n愛すべき欠点は、その「子供のような短気さ」です。信号待ちやレジの行列でイライラして貧乏ゆすりをしたり、負けず嫌いすぎてゲームで本気になったりする姿は、周囲に「手のかかる暴れん坊」として愛されています。",
+        "shadow_phase": "【ストレス反応：破壊的衝動】\n自分の正義が通じない環境に置かれると、すべてをリセットしたくなります。関係をバッサリ切ったり、積み上げたものを自ら壊したりと、衝動的な行動に出がちです。「もう知らない！」とちゃぶ台をひっくり返す前に、一度深呼吸が必要です。",
+        "trivia": [
+            "「結論から言うと」が口癖",
+            "行列に並ぶくらいなら、店を変える",
+            "負けず嫌いすぎて、じゃんけんでも勝ちたい",
+            "お世辞を言われても「何が狙いだ？」と疑う",
+            "即断即決すぎて、後でたまに後悔する"
+        ],
+        "golden_rule_long": "『剣を収める』美学を、身につけよ。\nあなたの鋭さは誰もが認めています。だからこそ、あえてその剣を抜かずに、言葉と態度で相手を納得させる包容力を身につけた時、あなたは単なる「暴れん坊」から、時代を創る「英雄」になります。"
     },
-    7: { # Type 8: 辛
+    7: { # Type 8: 辛 (THE IDOL)
         "name": "繊細な宝石 (THE IDOL)",
         "catch": "試練を輝きに変える、美しきカリスマ",
-        "desc": "あなたは生まれながらの「選ばれし姫・王子」です。高貴なオーラを放っていますが、**メンタルはスライム級に弱く、特別扱いされないとすぐに拗ねますよね？**（アンビバレンス）。最近、LINEの既読スルーに傷つき、「もうブロックしてやる！」と一人で悲劇のヒロインになりませんでしたか？（ショットガン）。その面倒くささは、細部まで妥協できない**「美の求道者」**であることの証明です（レアリティ）。",
-        "flaw": "【超・ワガママちゃん】\nプライドが高く謝れません。しかしそれは、自分自身をブランドとして確立し、安売りしないというプロ意識の高さゆえです。",
-        "desire": "特別感・洗練",
-        "habit": "美意識が高い言葉選び。汚い言葉を嫌う。既読スルーされるとこの世の終わりのように激怒する。",
-        "shadow": "【自虐と他責】\n「どうせ私なんて」と卑下します。それは、あなたが誰よりも高い理想を自分に課し、必死にもがいている証拠なのです（バリデーション）。",
-        "golden_rule": "『傷』を『勲章』に変えよ",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、泥の中から掘り出され、磨かれることで輝きを放つ宝石のように、特別なオーラを纏った人です。生まれながらにして「その他大勢」とは違う気品や美意識を持っており、俗世間の雑多なものとは一線を画しています。試練や苦労が多い人生かもしれませんが、それを乗り越えるたびに人間的な深みと魅力が増し、人々を魅了するカリスマへと成長していきます。",
+        "social_style": "【対人スタイル：高貴な選民】\nプライドが高く、自分を安売りしません。誰とでも仲良くするわけではなく、自分の美意識に敵う相手だけをテリトリーに入れます。\n一方で、心を許した相手には非常に甘えん坊で、ワガママな一面を見せます。「私のことを一番に扱ってほしい」という願望が強く、少しでも蔑ろにされると、この世の終わりのように傷つき、殻に閉じこもってしまいます。",
+        "inner_drive": "【本音と欠点：特別への執着】\nあなたが最も恐れているのは「埋没すること」です。自分は何者かであるはずだ、という強い自負があり、常に完璧で美しい自分であろうと努力しています。\n愛すべき欠点は、その「メンタルの弱さ」です。普段はツンとしていても、批判されるとガラスのように砕け散り、メソメソと悩み続ける。そのギャップが、守ってあげたいという周囲の庇護欲を刺激します。",
+        "shadow_phase": "【ストレス反応：自虐と他責】\n傷つくことを極端に恐れるあまり、先回りして「どうせ私なんて」と自虐するか、逆に「周りのレベルが低い」と他責にして自分を守ろうとします。自尊心が傷つけられると、相手を徹底的に無視するなど、攻撃的ではなく「遮断」によって報復します。",
+        "trivia": [
+            "汚い言葉や、下品な振る舞いが生理的に無理",
+            "LINEの既読スルーは「重罪」だと認定している",
+            "褒められるときは「具体的」じゃないと響かない",
+            "自分へのご褒美（スイーツや服）が多すぎる",
+            "プライドが高すぎて、謝るのが死ぬほど下手"
+        ],
+        "golden_rule_long": "『傷』を『勲章』に、変える強さを持て。\n傷つくことを恐れないでください。原石は削られなければ輝きません。辛い経験やコンプレックスさえも、あなたという物語を彩るスパイスとして愛せた時、あなたは誰よりも美しく輝きます。"
     },
-    8: { # Type 9: 壬
+    8: { # Type 9: 壬 (THE NOMAD)
         "name": "自由な冒険家 (THE NOMAD)",
         "catch": "境界を超えて流れる、自由の象徴",
-        "desc": "あなたはスケールの大きい永遠の旅人です。夢を語らせたら右に出る者はいませんが、**飽きっぽすぎて、昨日言ったことと今日言ったことが全然違いますよね？**（アンビバレンス）。最近、面倒くさい約束を「体調不良」ということにしてドタキャンしたことがありますよね？（ショットガン）。その無責任さは、一つの場所に留まらず、世界に新しい風を吹き込む**「流動する知性」**だからこそ許される特権です（レアリティ）。",
-        "flaw": "【音信不通の常習犯】\n責任から逃げ出します。しかしそれは、直感が「今は動くべき時ではない」と告げている、野生の勘が鋭すぎる結果なのです。",
-        "desire": "自由・流動",
-        "habit": "誰とでもタメ口で仲良くなれる。LINEは超・気分屋で、返信速度にムラがありすぎる。",
-        "shadow": "【逃避と氾濫】\n全てを放り出して蒸発します。それは、あなたの器が大きすぎて、小さな枠組みに押し込められると氾濫してしまう大河だからです（バリデーション）。",
-        "golden_rule": "『帰る場所』を作れ",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、留まることを知らない大河や、大海原のように、圧倒的なスケールと流動性を持った自由人です。既存の枠組みや常識に囚われず、常に新しい世界、新しい価値観を求めて彷徨っています。「普通はこうする」という言葉は、あなたにとっては何の意味も持ちません。そのダイナミックな生き様と、夢を語るロマンチストな一面は、多くの人を惹きつけ、新しい風を吹き込みます。",
+        "social_style": "【対人スタイル：来る者拒まず去る者追わず】\n誰とでもフランクに接し、すぐに打ち解けるコミュニケーション能力を持っています。しかし、誰か一人に執着することはなく、風のように現れては去っていきます。\n「束縛」を何よりも嫌い、責任や約束で縛られそうになると、本能的に逃げ出します。つかみどころがなく、本心がどこにあるのか誰にも（自分でも）わからないミステリアスな魅力があります。",
+        "inner_drive": "【本音と欠点：停滞への恐怖】\nあなたが動き続けるのは、止まると水が澱んでしまうように、自分が腐ってしまう気がするからです。常に「ここではないどこか」を探しています。\n愛すべき欠点は、驚くべき「無責任さ」です。大事な局面で「飽きた」と言い出したり、面倒な約束をドタキャンしたり。しかし、その悪びれない天真爛漫さが、なぜか許されてしまう徳を持っています。",
+        "shadow_phase": "【ストレス反応：氾濫と逃走】\n狭いルールに押し込められると、感情が決壊して大暴れするか、あるいは一切の連絡を絶って蒸発（逃亡）します。ストレス耐性は意外と低く、嫌なことがあると現実逃避に走り、長い眠りについたり、放浪の旅に出たりします。",
+        "trivia": [
+            "昨日と言っていることが180度違うことがある",
+            "「一生のお願い」を人生で100回くらい使っている",
+            "旅行の計画は立てず、当日の気分で決める",
+            "束縛の激しい恋人とは3日で別れる自信がある",
+            "知的好奇心は凄まじいが、持続力は3日坊主"
+        ],
+        "golden_rule_long": "『帰る場所』を、一つだけ作れ。\n自由であることと、根無し草であることは違います。どんなに遠くへ行っても、そこに戻れば自分らしくいられる「港（パートナーや拠点）」を持つことで、あなたの航海はより遠くまで、より安全に続くようになります。"
     },
-    9: { # Type 10: 癸
+    9: { # Type 10: 癸 (THE COUNSELOR)
         "name": "癒やしの共感者 (THE COUNSELOR)",
         "catch": "静かに浸透する、慈愛の賢者",
-        "desc": "あなたは雨のように静かに人に寄り添う癒やし系です。ニコニコと人の話を聞いていますが、**心の中では「こいつ、バカだな」と冷静に見下している瞬間がありますよね？**（アンビバレンス）。最近、嫌なことがあって、何も言わずに連絡先をブロック・削除してスッキリしませんでしたか？（ショットガン）。あなたはただの大人しい人ではありません。世の中の裏側まで見通す**「静かなる賢者」**なのです（レアリティ）。",
-        "flaw": "【自分がないスライム】\n影響を受けすぎて形が変わります。しかしそれは、相手の色に染まることで、相手の痛みを我が事のように理解できる究極の共感力です。",
-        "desire": "共感・貢献",
-        "habit": "受動的。自分からは発信しない。争いを避けるためなら、自分の意見を飲み込んでニコニコする。",
-        "shadow": "【自己卑下と遮断】\n突然人間関係をリセット（サイレント絶交）します。それは、あなたが他人の負の感情を吸い取りすぎて、心がパンクしそうになっているSOSサインです（バリデーション）。",
-        "golden_rule": "『自分』という器を持て",
-        "cta_text": COMMON_CTA
+        "intro": "あなたは、大地を潤す雨や霧のように、静かに周囲に浸透し、人々の心に寄り添う癒やしの存在です。派手な自己主張はしませんが、驚くほどの知識と知恵を蓄えており、物事の裏側や人の本質を冷静に見抜いています。他人の痛みや悲しみを、まるで自分のことのように感じる共感能力（エンパス）を持っており、傷ついた人々が最後に辿り着く「避難所」のような役割を果たします。",
+        "social_style": "【対人スタイル：同調と献身】\nあなたは「水」のように、相手の形に合わせて自分を変えることができます。攻撃的な人の前では受け流し、悲しむ人の前では共に泣く。その柔軟性は組織の潤滑油として重宝されます。\nしかし、自分の意見を飲み込み、ニコニコしてやり過ごすことが多いため、ストレスを内側に溜め込みがちです。表面上は穏やかですが、内面では冷静に相手を分析し、評価を下しているシビアな一面もあります。",
+        "inner_drive": "【本音と欠点：自己の希薄さ】\n相手に合わせすぎて、「本当の自分がわからない」という悩みを抱えがちです。誰かの役に立つことで自分の輪郭を確かめようとします。\n愛すべき欠点は、限界を超えた時の「サイレント絶交」です。嫌だと言えずに我慢し続け、ある日突然、何の前触れもなく連絡先をブロックして関係を断ち切る。その静かなる拒絶は、周囲を震撼させます。",
+        "shadow_phase": "【ストレス反応：自己卑下と遮断】\nネガティブな感情に支配されると、「私なんていない方がいい」と極端に落ち込み、殻に閉じこもります。外界からの情報をすべて遮断し、内面世界に沈み込んでいくため、周囲からは急に連絡が取れなくなったように見えます。",
+        "trivia": [
+            "大人数の飲み会より、サシ飲みが好き",
+            "妄想や空想をしている時間が一番幸せ",
+            "嫌なことがあると、寝てリセットしようとする",
+            "「何でもいいよ」と言うときは、本当に何でもいい",
+            "実は、かなりマニアックなオタク趣味がある"
+        ],
+        "golden_rule_long": "『自分』という器を、意識的に持て。\n水は器によって形を変えますが、あなた自身の形も大切にしてください。「私はこう思う」「私はこれが嫌だ」という核を持つことで、あなたは周囲に流されるだけでなく、自らの意思で大河のような流れを作れる賢者になります。"
     }
 }
 
-# --- 占術パラメータ（変更なし） ---
-GAN_ELEMENTS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
-GAN_FIVE = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4] 
-ZHI_FIVE = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4] 
-SOLAR_TERMS = [6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7] 
-ENERGY_STRENGTH = [
-    [3, 2, 3, 3, 2, 1, 1, 1, 1, 1, 2, 3], [3, 2, 3, 3, 2, 1, 1, 1, 1, 1, 2, 3],
-    [1, 1, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1], [1, 1, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1],
-    [1, 2, 3, 3, 3, 3, 3, 2, 1, 1, 1, 1], [1, 2, 3, 3, 3, 3, 3, 2, 1, 1, 1, 1],
-    [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1], [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1],
-    [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3], [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3]
-]
-COMPATIBILITY_MAP = {
-    0: ["No.6 尽くす世話焼き", "No.7 正義の切り込み隊長", "No.4 熱き夢想家"], 1: ["No.7 正義の切り込み隊長", "No.8 繊細な宝石", "No.3 天性の主人公"],
-    2: ["No.8 繊細な宝石", "No.9 自由な冒険家", "No.5 不動の守護神"], 3: ["No.9 自由な冒険家", "No.10 癒やしの共感者", "No.6 尽くす世話焼き"],
-    4: ["No.10 癒やしの共感者", "No.1 頼れる親分肌", "No.7 正義の切り込み隊長"], 5: ["No.1 頼れる親分肌", "No.2 愛され調整役", "No.8 繊細な宝石"],
-    6: ["No.2 愛され調整役", "No.3 天性の主人公", "No.9 自由な冒険家"], 7: ["No.3 天性の主人公", "No.4 熱き夢想家", "No.10 癒やしの共感者"],
-    8: ["No.4 熱き夢想家", "No.5 不動の守護神", "No.1 頼れる親分肌"], 9: ["No.5 不動の守護神", "No.6 尽くす世話焼き", "No.2 愛され調整役"]
-}
-
 # ==========================================
-# 4. Logic Engines
+# 4. Logic Engines (Fortune & Science)
 # ==========================================
 
 def calculate_big5(answers):
@@ -289,18 +355,20 @@ def calculate_big5(answers):
         "Neuroticism": answers["Q4"] + (8 - answers["Q9"]),
         "Openness": answers["Q5"] + (8 - answers["Q10"])
     }
+    # 1-5段階へ正規化
     scores_norm = {k: round(1 + (v - 2) * 4 / 12, 1) for k, v in scores_raw.items()}
     return scores_raw, scores_norm
 
-def get_gap_hook(fate_type_id, scores_norm):
+def analyze_big5_gap(scores_norm, fate_type_id):
+    """宿命と現在のギャップからフック文章を生成"""
     is_gap = False
     # 簡易ギャップロジック
     if fate_type_id in [0, 2, 6] and scores_norm["Extraversion"] < 2.5: is_gap = True
     elif fate_type_id in [1, 9] and scores_norm["Agreeableness"] < 2.5: is_gap = True
     elif fate_type_id in [4, 7] and scores_norm["Conscientiousness"] < 2.5: is_gap = True
     
-    if is_gap: return "WARNING", "⚠️ 注意：あなたの本来の強みが、現在60%死んでいます。"
-    else: return "SUCCESS", "✨ 素晴らしい：宿命通りに才能が発揮されています。ただし…"
+    if is_gap: return "⚠️ 注意：あなたの本来の才能が、現在60%死んでいます。"
+    else: return "✨ 素晴らしい：宿命通りに才能が発揮されています。ただし…"
 
 class FortuneEngineIntegrated:
     def __init__(self):
@@ -353,30 +421,28 @@ class FortuneEngineIntegrated:
             score_5 = 1 if v==0 else (2 if v==1 else (3 if v==2 else (4 if v==3 else 5)))
             normalized_scores[k] = score_5
 
-        scores_raw = counts
-        axis_1 = "L" if scores_raw["Vitality"] >= scores_raw["Create"] else "S"
-        defensive = scores_raw["Status"] + scores_raw["Vitality"]
-        offensive = scores_raw["Economy"] + scores_raw["Create"]
+        axis_1 = "L" if counts["Vitality"] >= counts["Create"] else "S"
+        defensive = counts["Status"] + counts["Vitality"]
+        offensive = counts["Economy"] + counts["Create"]
         axis_2 = "R" if defensive >= offensive else "G"
         energy_sum = ENERGY_STRENGTH[gan][zhi] + ENERGY_STRENGTH[gan][m_zhi] + ENERGY_STRENGTH[gan][y_zhi]
         axis_3 = "I" if energy_sum >= 6 else "D"
-        social = scores_raw["Economy"] + scores_raw["Status"]
-        axis_4 = "M" if scores_raw["Identity"] * 1.5 >= social else "Y"
+        social = counts["Economy"] + counts["Status"]
+        axis_4 = "M" if counts["Identity"] * 1.5 >= social else "Y"
         fate_code = f"{axis_1}{axis_2}{axis_3}{axis_4}"
 
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. Main UI Application
+# 5. Main UI Application (Reading Mode)
 # ==========================================
 
 st.title("Project MAP")
+main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 
-main_tab, catalog_tab = st.tabs(["DIAGNOSIS (診断)", "ALL TYPES (図鑑)"])
-
-# --- Tab 1: Diagnosis ---
+# --- Tab 1: 診断 & 結果 ---
 with main_tab:
-    # A. Form
+    # A. 入力フォーム
     with st.form("diagnosis_form"):
         st.markdown("### 1. 生年月日")
         col_y, col_m, col_d = st.columns([1.2, 1, 1])
@@ -385,93 +451,118 @@ with main_tab:
         with col_d: day = st.selectbox("日", list(range(1, 32)), index=0)
             
         st.markdown("---")
-        st.markdown("### 2. 科学的性格診断 (TIPI-J)")
+        st.markdown("### 2. 性格診断 (任意)")
         st.caption("直感で答えてください（1:全く違う 〜 7:強くそう思う）")
         
         tipi_answers = {}
         for q_id, q_text in TIPI_QUESTIONS.items():
-            st.markdown(f"<div style='font-weight:bold;'>{q_text}</div>", unsafe_allow_html=True)
-            tipi_answers[q_id] = st.slider(f"", 1, 7, 4, key=f"form_{q_id}")
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(f"**{q_text}**")
+            tipi_answers[q_id] = st.slider("", 1, 7, 4, key=f"f_{q_id}", label_visibility="collapsed")
+            st.markdown("") # Spacer
             
-        submitted = st.form_submit_button("運命を診断する", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("診断結果を読む", type="primary", use_container_width=True)
     
-    # B. Result
+    # B. 結果表示 (Reading Mode)
     if submitted:
         try:
             date_obj = datetime.date(year, month, day)
             date_str = date_obj.strftime("%Y/%m/%d")
             
+            # エンジン実行
             engine = FortuneEngineIntegrated()
             result = engine.analyze_basic(date_str)
             gan_id = result['gan']
             content = DIAGNOSIS_CONTENT[gan_id]
+            fate_scores = result['scores']
             fate_code = result['fate_code']
             
+            # Big Five & Gap
             _, big5_norm = calculate_big5(tipi_answers)
-            status, hook_text = get_gap_hook(gan_id, big5_norm)
+            hook_text = analyze_big5_gap(big5_norm, gan_id)
 
-            # === IDENTITY AREA ===
-            st.markdown('<div class="result-card identity-header">', unsafe_allow_html=True)
-            st.markdown(f"<div class='type-label'>FATE CODE: {fate_code}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='type-name'>{content['name']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='catch-copy'>{content['catch']}</div>", unsafe_allow_html=True)
+            # === HERO SECTION ===
+            st.markdown('<div class="read-card type-header">', unsafe_allow_html=True)
+            st.markdown(f"<div class='type-sub'>FATE CODE: {fate_code}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='type-main'>{content['name']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='hero-copy'>{content['catch']}</div>", unsafe_allow_html=True)
             
             img_path = load_image(gan_id + 1)
             if img_path: st.image(img_path, use_container_width=True)
             else: st.image("https://placehold.co/400x400/F0F0F0/333?text=No+Image", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # === DEEP DIVE (Psychology) ===
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            st.markdown("<div class='text-label'>👤 あなたの本質と裏側</div>", unsafe_allow_html=True)
-            st.write(content['desc'])
+            # === STORY SECTION (読み物エリア) ===
+            st.markdown('<div class="read-card">', unsafe_allow_html=True)
             
-            st.markdown("<div class='text-label'>⚠️ 愛すべき欠点 (才能の裏返し)</div>", unsafe_allow_html=True)
-            st.write(content['flaw'])
-            
-            st.markdown("<div class='text-label'>🔥 基本的欲求</div>", unsafe_allow_html=True)
-            st.write(content['desire'])
-            
-            st.markdown("<div class='text-label'>🗣️ コミュニケーションの癖</div>", unsafe_allow_html=True)
-            st.write(content['habit'])
-            
-            st.markdown("<div class='text-label'>🌑 ストレス時の反応 (Shadow)</div>", unsafe_allow_html=True)
-            st.write(content['shadow'])
-            
-            st.markdown(f"<div class='quote-box'>💡 処方箋: {content['golden_rule']}</div>", unsafe_allow_html=True)
+            # 序文
+            st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px;'>{content['intro']}</div>", unsafe_allow_html=True)
+            st.markdown("---")
+
+            # 1. 対人スタイル
+            st.markdown("<h3>① 対人関係のスタイル</h3>", unsafe_allow_html=True)
+            st.write(content['social_style'])
+
+            # 2. 隠された本音
+            st.markdown("<h3>② 隠された本音と欠点</h3>", unsafe_allow_html=True)
+            st.write(content['inner_drive'])
+
+            # 3. ストレス時の影
+            st.markdown("<h3>③ ストレス時の『影』</h3>", unsafe_allow_html=True)
+            st.write(content['shadow_phase'])
+
+            # 4. あるあるチェックリスト
+            st.markdown("<h3>④ あなたの『あるある』</h3>", unsafe_allow_html=True)
+            st.markdown('<div class="trivia-box">', unsafe_allow_html=True)
+            for t in content['trivia']:
+                st.markdown(f"<div class='trivia-item'><span class='trivia-icon'>✔</span> {t}</div>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # === ANALYSIS (寸止め) ===
-            st.markdown('<div class="section-title">📊 科学的分析 (現在)</div>', unsafe_allow_html=True)
-            if status == "WARNING":
+            # 5. 処方箋
+            st.markdown(f"""
+            <div class='prescription-box'>
+                <div class='rule-title'>GOLDEN RULE</div>
+                <div class='rule-text'>{content['golden_rule_long']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # === ANALYSIS SECTION (寸止め・Lock) ===
+            st.markdown("<h3>📊 現在の科学的分析</h3>", unsafe_allow_html=True)
+            
+            # フック文章
+            if "注意" in hook_text:
                 st.error(hook_text)
             else:
                 st.success(hook_text)
             
-            st.markdown('<div class="analysis-card">', unsafe_allow_html=True)
-            st.markdown('<div class="blurred">', unsafe_allow_html=True)
+            # ロックされたカード
+            st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
             
-            # Dummy Chart for Blur
-            categories = ['外向', '開放', '協調', '勤勉', '安定']
+            # ぼかされた中身
+            st.markdown('<div class="blurred-content">', unsafe_allow_html=True)
+            categories = ['外向性', '開放性', '協調性', '勤勉性', '安定性']
             fig = go.Figure()
-            fig.add_trace(go.Scatterpolar(r=[3,4,3,4,3], theta=categories, fill='toself'))
-            fig.update_layout(height=300)
+            # ダミーデータで雰囲気だけ見せる
+            fig.add_trace(go.Scatterpolar(r=[3,4,2,5,3], theta=categories, fill='toself', name='Current'))
+            fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), height=300)
             st.plotly_chart(fig, use_container_width=True)
-            st.write("ここに詳細な分析結果が表示されます..." * 5)
+            st.write("ここにはあなたの現在の精神状態、ストレスレベル、そして運命とのギャップについての詳細な分析が表示されます。" * 3)
             st.markdown('</div>', unsafe_allow_html=True)
-            
-            # CTA Overlay
+
+            # オーバーレイ (CTA)
             st.markdown(f"""
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; text-align: center;">
-                <div style="background:rgba(255,255,255,0.9); padding:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-                    <p style="font-weight:bold; margin-bottom:15px; color:#333;">{content['cta_text']}</p>
+            <div class="lock-overlay">
+                <div class="lock-card">
+                    <p style="font-weight:bold; font-size:1.1rem; color:#333; margin-bottom:15px;">
+                        🔒 続きはLINEで確認<br>
+                        <span style="font-size:0.9rem; color:#666;">運命の相性リスト・裏性格レポート</span>
+                    </p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            # Button outside the overlay div to ensure clickability
-            st.link_button("LINEで『裏』解析レポートを見る (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+            # ボタンはオーバーレイの外（クリック可能エリア）に配置
+            st.link_button("LINEで完全版レポートを読む (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
         except ValueError:
@@ -484,9 +575,10 @@ with catalog_tab:
     for i in range(10):
         c = DIAGNOSIS_CONTENT[i]
         with cols[i % 2]:
-            st.markdown('<div class="result-card" style="padding:15px; text-align:center;">', unsafe_allow_html=True)
+            st.markdown('<div class="read-card" style="padding:15px; text-align:center; margin-bottom:15px;">', unsafe_allow_html=True)
             img_path = load_image(i + 1)
             if img_path: st.image(img_path, use_container_width=True)
-            st.caption(c['name'])
-            st.markdown(f"**{c['catch']}**")
+            else: st.image("https://placehold.co/200x200/F0F0F0/333?text=No+Image", use_container_width=True)
+            st.markdown(f"**{c['name']}**")
+            st.caption(c['catch'])
             st.markdown('</div>', unsafe_allow_html=True)
