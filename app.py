@@ -6,123 +6,92 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Reading Mode)
+# 1. Page Config & CSS (Theme Color Ready)
 # ==========================================
 st.set_page_config(
     page_title="Project MAP | 性格の解剖図鑑",
     page_icon=None,
-    layout="centered", # 長文は中央寄せが読みやすい
+    layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
 <style>
-    /* ベーススタイル：読み物としての最適化 */
+    /* ベーススタイル */
     .stApp {
         background-color: #FFFFFF;
         color: #2c3e50;
         font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-        line-height: 1.9; /* 行間を広く取って読みやすく */
-        letter-spacing: 0.03em;
+        line-height: 2.0; /* 読みやすさ重視の広い行間 */
+        letter-spacing: 0.04em;
     }
     
-    /* カードデザイン */
+    /* カードデザイン（枠線色は動的に変更するためPython側で指定） */
     .read-card {
         background-color: #FFFFFF;
         padding: 32px 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        border: 1px solid #F0F0F0;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
         margin-bottom: 40px;
+        transition: transform 0.2s ease;
     }
     
-    /* 見出しスタイル */
+    /* 印象セクションのリストスタイル */
+    .impression-box {
+        padding: 15px;
+        border-radius: 8px;
+        height: 100%;
+    }
+    .impression-title {
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .impression-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    .impression-list li {
+        margin-bottom: 6px;
+        padding-left: 1.2em;
+        text-indent: -1.2em;
+    }
+    .impression-list li:before {
+        content: "• ";
+        font-weight: bold;
+    }
+
+    /* 見出しスタイル（色は動的） */
     h3 {
-        font-size: 1.4rem !important;
-        font-weight: 800 !important;
-        color: #111 !important;
-        margin-top: 40px !important;
-        margin-bottom: 20px !important;
-        border-bottom: 2px solid #00C853;
+        font-size: 1.5rem !important;
+        font-weight: 900 !important;
+        margin-top: 50px !important;
+        margin-bottom: 25px !important;
         display: inline-block;
+        border-bottom: 3px solid #ccc; /* デフォルト */
         padding-bottom: 5px;
     }
     
-    h4 {
-        font-size: 1.1rem !important;
-        font-weight: 700 !important;
-        color: #555 !important;
-        margin-top: 20px !important;
-        margin-bottom: 10px !important;
-    }
-
-    /* アイデンティティヘッダー */
-    .type-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    .type-sub {
-        font-size: 0.9rem;
-        color: #999;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }
-    .type-main {
-        font-size: 2.2rem;
-        font-weight: 900;
-        color: #222;
-        line-height: 1.2;
-        margin-bottom: 15px;
-    }
-    .hero-copy {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #00C853;
-        margin-bottom: 20px;
-    }
-
-    /* あるあるリスト（トリビア） */
-    .trivia-box {
-        background-color: #F9F9F9;
-        padding: 20px;
-        border-radius: 8px;
-        border-left: 4px solid #aaa;
-    }
-    .trivia-item {
-        font-size: 1.0rem;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: start;
-    }
-    .trivia-icon {
-        color: #00C853;
-        margin-right: 10px;
-        font-weight: bold;
+    /* テキスト本文の強調 */
+    strong {
+        background: linear-gradient(transparent 70%, #f0f0f0 70%);
+        padding: 0 2px;
     }
 
     /* 処方箋（Golden Rule） */
     .prescription-box {
-        background: linear-gradient(135deg, #00C853 0%, #009624 100%);
         color: white;
         padding: 30px;
         border-radius: 12px;
         margin-top: 40px;
         text-align: center;
-    }
-    .rule-title {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-    }
-    .rule-text {
-        font-size: 1.3rem;
-        font-weight: 800;
-        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
-    /* ぼかし＆ロック */
+    /* 寸止めエリア */
     .blurred-content {
         filter: blur(8px);
         opacity: 0.5;
@@ -142,7 +111,8 @@ st.markdown("""
         background: rgba(255,255,255,0.95);
         padding: 25px;
         border-radius: 12px;
-        box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+        border: 1px solid #ddd;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -178,14 +148,18 @@ TIPI_QUESTIONS = {
     "Q9": "冷静で、気分が安定していると思う", "Q10": "発想力に欠けた、平凡な人間だと思う"
 }
 
-# 診断コンテンツ（前半：Type 1 - Type 5）
+# 全タイプ共通CTA
+COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
+
+# 診断コンテンツ（Type 1 - Type 5）
 DIAGNOSIS_CONTENT = {
-    0: { # Type 1: 甲 (THE LEADER)
+    0: { # Type 1: 甲
         "name": "頼れる親分肌 (THE LEADER)",
+        "color": "#2E7D32", # Forest Green
         "catch": "折れない信念を持つ、孤高の統率者",
-        "intro": "あなたには、生まれながらにして人々を惹きつけ、自然と集団の中心に立ってしまう引力があります。それは単なる明るさではなく、「この人は何かを変えてくれるかもしれない」と他人に予感させる、圧倒的な頼もしさと威厳です。大樹が大地に根を張るように、あなたは揺るぎない自分軸を持っており、混沌とした状況においてこそ、その存在感は際立ちます。しかし、その真っ直ぐすぎる姿勢は、時に周囲に「近寄りがたい」という緊張感を与えているかもしれません。",
-        "social_style": "【対人スタイル：守護と支配】\nあなたは「身内」と認定した人間に対しては、海よりも深い愛情と責任感で守り抜きます。部下のミスを被ったり、友人の窮地には損得抜きで駆けつける親分肌です。しかし、その反面、自分の価値観やルールに反する人間に対しては容赦がありません。「無能」「不誠実」と判断した相手には、氷のように冷徹な態度を取り、心のシャッターを完全に下ろします。議論においては、感情論を嫌い、正論という名の凶器で相手を黙らせてしまう傾向があり、勝っても「孤独」を感じることがあるでしょう。",
-        "inner_drive": "【本音と欠点：完全への渇望】\nあなたがこれほどまでに強く振る舞うのは、実は心の奥底に「混沌」や「無秩序」に対する根源的な恐怖があるからです。「自分がしっかりしなければ崩壊する」という強迫観念にも似た責任感が、あなたを突き動かしています。\n愛すべき欠点は、その「不器用なほどの融通の利かなさ」です。誰もが適当に流すような小さな不正義も許せず、一人でカリカリしてしまう姿は、周囲からは「面倒くさいけれど、信頼できる人」として愛されています。",
+        "intro": "あなたには、生まれながらにして人々を惹きつけ、自然と集団の中心に立ってしまう引力があります。それは単なる明るさではなく、「この人は何かを変えてくれるかもしれない」と他人に予感させる、圧倒的な頼もしさと威厳です。大樹が大地に根を張るように、あなたは揺るぎない「自分軸」を持っており、混沌とした状況においてこそ、その存在感は際立ちます。しかし、その真っ直ぐすぎる姿勢は、時に周囲に「近寄りがたい」「完璧すぎて息が詰まる」という緊張感を与えているかもしれません。あなたは自身の弱さを隠すのが上手ですが、実は誰よりも「正しくあろう」と必死にもがいている孤独な努力家でもあります。",
+        "social_style": "【対人スタイル：守護と支配のパラドックス】\nあなたは「身内」と認定した人間に対しては、海よりも深い愛情と責任感で守り抜きます。部下のミスを被ったり、友人の窮地には損得抜きで駆けつける親分肌です。その愛は深く、一度懐に入れた人間は一生面倒を見る覚悟を持っています。\nしかし、その反面、自分の価値観やルールに反する人間に対しては容赦がありません。「無能」「不誠実」と判断した相手には、氷のように冷徹な態度を取り、心のシャッターを完全に下ろします。議論においては、感情論を嫌い、正論という名の凶器で相手を黙らせてしまう傾向があります。論破した後に感じるのは、勝利の快感ではなく、「なぜわかってくれないのか」という深い孤独感ではないでしょうか。",
+        "inner_drive": "【本音と欠点：完全への渇望と恐怖】\nあなたがこれほどまでに強く振る舞うのは、実は心の奥底に「混沌」や「無秩序」に対する根源的な恐怖があるからです。「自分がしっかりしなければ組織が崩壊する」「自分が折れたら終わりだ」という強迫観念にも似た責任感が、あなたを突き動かしています。\n愛すべき欠点は、その「不器用なほどの融通の利かなさ」です。誰もが適当に流すような小さな不正義も許せず、一人でカリカリしてしまう姿。それは周囲から見れば「面倒くさい人」ですが、同時に「絶対に裏切らない信頼できる人」という評価にも繋がっています。",
         "shadow_phase": "【ストレス反応：孤立する暴君】\n精神的な余裕を失うと、あなたは「どうして誰も私のレベルで動けないんだ」と周囲を断罪し始めます。完璧主義が暴走し、他人の些細な欠点をあげつらったり、独善的な命令を下したりして、自ら孤立を深めていきます。最終的には「もう全部一人でやる」と殻に閉じこもり、心身ともに燃え尽きるまで走り続けてしまう危険性があります。",
         "trivia": [
             "歩くのが遅い人の後ろにいると、露骨にイライラしてしまう",
@@ -194,15 +168,18 @@ DIAGNOSIS_CONTENT = {
             "実は涙もろいが、人前では絶対に泣かないと決めている",
             "誰も見ていないところでも、赤信号は絶対に渡らない"
         ],
-        "golden_rule_long": "『負けるが勝ち』を、戦略としてインストールせよ。\nあなたの正しさは誰もが認めています。だからこそ、あえて相手に花を持たせ、頭を下げる「演技」を覚えたとき、あなたは単なる実力者から、誰もが心服する真の王になります。"
+        "impression_good": ["圧倒的な安心感と統率力", "嘘をつかない誠実さ", "どんな混乱も鎮める解決力"],
+        "impression_bad": ["息が詰まるほどの威圧感", "正論すぎて逃げ場がない", "デリカシーが行方不明"],
+        "golden_rule_long": "『負けるが勝ち』を、戦略としてインストールせよ。\nあなたの正しさは誰もが認めています。だからこそ、あえて相手に花を持たせ、頭を下げる「演技」を覚えたとき、あなたは単なる実力者から、誰もが心服する真の王になります。",
+        "cta_text": COMMON_CTA
     },
-    1: { # Type 2: 乙 (THE CONNECTOR)
+    1: { # Type 2: 乙
         "name": "愛され調整役 (THE CONNECTOR)",
+        "color": "#2E7D32", # Forest Green
         "catch": "したたかに生き残る、柔軟な戦略家",
-        "desc": "省略", # 互換性のため
-        "intro": "あなたは、コンクリートの隙間からでも花を咲かせる草花のように、どんな過酷な環境でも生き残る「生存戦略の天才」です。決して声高に自己主張するわけではありませんが、気づけばキーマンの隣に座り、最も居心地の良いポジションを確保している。そんな「柔よく剛を制す」しなやかさがあなたの武器です。一見、無害で人当たりの良い人物に見えますが、その笑顔の裏には、周囲のパワーバランスを冷静に見極める計算高い瞳が隠されています。",
-        "social_style": "【対人スタイル：全方位外交と依存】\nあなたは「敵を作らない」ことにかけては世界一の才能を持っています。相手によって声のトーンや話題を瞬時に変え、誰とでも心地よい関係を築くカメレオンのような社交術を持っています。\nしかし、それは「嫌われたくない」という防衛本能の裏返しでもあります。決断を迫られると「私はどっちでもいいよ」と判断を相手に委ね、責任を回避する傾向があります。集団の調和を乱すまいとするあまり、八方美人になりすぎて、信用を失うリスクを常に抱えています。",
-        "inner_drive": "【本音と欠点：孤独への恐怖】\nあなたがこれほどまでに空気を読むのは、集団から弾き出されることへの強烈な恐怖があるからです。「一人では生きていけない」と本能的に悟っており、常に誰かと繋がっていることで安心感を得ようとします。\n愛すべき欠点は、その「わかりやすすぎる計算高さ」です。メリットのある人には尻尾を振るのに、どうでもいい人には少し雑になる。その人間臭い現金さが、逆に「憎めないキャラ」として定着しています。",
+        "intro": "あなたは、コンクリートの隙間からでも花を咲かせる草花のように、どんな過酷な環境でも生き残る「生存戦略の天才」です。決して声高に自己主張するわけではありませんが、気づけばキーマンの隣に座り、最も居心地の良いポジションを確保している。そんな「柔よく剛を制す」しなやかさがあなたの武器です。一見、無害で人当たりの良い人物に見えますが、その笑顔の裏には、周囲のパワーバランスを冷静に見極める計算高い瞳が隠されています。あなたは誰よりも早く「空気」を読み、その場の最適解を演じることができます。",
+        "social_style": "【対人スタイル：全方位外交と依存】\nあなたは「敵を作らない」ことにかけては世界一の才能を持っています。相手によって声のトーンや話題を瞬時に変え、誰とでも心地よい関係を築くカメレオンのような社交術を持っています。剛腕なリーダータイプとも、気難しい職人タイプとも上手くやれるのはあなただけです。\nしかし、それは「嫌われたくない」という防衛本能の裏返しでもあります。決断を迫られると「私はどっちでもいいよ」と判断を相手に委ね、責任を回避する傾向があります。集団の調和を乱すまいとするあまり、八方美人になりすぎて、信用を失うリスクを常に抱えています。",
+        "inner_drive": "【本音と欠点：孤独への恐怖】\nあなたがこれほどまでに空気を読むのは、集団から弾き出されることへの強烈な恐怖があるからです。「一人では生きていけない」と本能的に悟っており、常に誰かと繋がっていることで安心感を得ようとします。自立することよりも、強い何かに巻きつかれる（所属する）ことを選びます。\n愛すべき欠点は、その「わかりやすすぎる計算高さ」です。メリットのある人には尻尾を振るのに、どうでもいい人には少し雑になる。その人間臭い現金さが、逆に「憎めないキャラ」として定着しています。",
         "shadow_phase": "【ストレス反応：悲劇のヒロイン】\n追い詰められると、急に被害者面をして責任転嫁を始めます。「あの人が言ったから」「私は悪くないのに」と周囲に吹聴し、同情を買うことで自分を守ろうとします。また、強いものに巻かれる傾向が強まり、自分の意思を完全に放棄して、操り人形のように振る舞うことで思考停止しようとします。",
         "trivia": [
             "興味のない話でも、笑顔で「すごーい！」と言える",
@@ -211,13 +188,17 @@ DIAGNOSIS_CONTENT = {
             "強い人の意見には、とりあえず0.5秒で同意する",
             "一人焼肉や一人映画には、実は行けない（寂しいから）"
         ],
-        "golden_rule_long": "『嫌われる勇気』が、最強の鎧になる。\n全員に好かれようとすることは、誰からも信頼されないことと同義です。10人のうち2人に嫌われても、自分の意志をはっきり示すことで、残りの8人との絆は、単なる「馴れ合い」を超えた本物の信頼へと変わります。"
+        "impression_good": ["物腰が柔らかく話しやすい", "空気が読める調整役", "敵を作らない世渡り上手"],
+        "impression_bad": ["本心がどこにあるか不明", "八方美人で信用できない", "決断を人任せにする"],
+        "golden_rule_long": "『嫌われる勇気』が、最強の鎧になる。\n全員に好かれようとすることは、誰からも信頼されないことと同義です。10人のうち2人に嫌われても、自分の意志をはっきり示すことで、残りの8人との絆は、単なる「馴れ合い」を超えた本物の信頼へと変わります。",
+        "cta_text": COMMON_CTA
     },
-    2: { # Type 3: 丙 (THE PROTAGONIST)
+    2: { # Type 3: 丙
         "name": "天性の主人公 (THE PROTAGONIST)",
+        "color": "#C62828", # Fire Engine Red
         "catch": "世界を照らす、あくなき挑戦者",
-        "intro": "あなたは、真夏の太陽のように強烈な光と熱を放つ、天性のエンターテイナーです。あなたが部屋に入ってきた瞬間、場の空気がパッと明るくなるような、不思議なオーラを纏っています。論理よりも感情、計画よりも情熱。「なんとかなるさ！」という根拠のない自信で周囲を巻き込み、いつの間にか皆をあなたのペースに乗せてしまう。良くも悪くも、世界はあなた中心に回っていると言っても過言ではありません。",
-        "social_style": "【対人スタイル：巻き込み型カリスマ】\n誰に対してもオープンマインドで、裏表のない性格は多くの人を惹きつけます。沈んでいる人を強引に外へ連れ出し、豪快に笑い飛ばして元気づけるような、圧倒的な陽のエネルギーを持っています。\n一方で、自分の話をするのが大好きで、相手の話を聞いているようで聞いていない「ジャイアン」的な側面も。しかし、その自己中心性すらも「まあ、あの人だから仕方ないか」と許させてしまう愛嬌こそが、あなたの最大の武器です。",
+        "intro": "あなたは、真夏の太陽のように強烈な光と熱を放つ、天性のエンターテイナーです。あなたが部屋に入ってきた瞬間、場の空気がパッと明るくなるような、不思議なオーラを纏っています。論理よりも感情、計画よりも情熱。「なんとかなるさ！」という根拠のない自信で突き進み、いつの間にか皆をあなたのペースに乗せてしまう。良くも悪くも、世界はあなた中心に回っていると言っても過言ではありません。隠し事ができず、感情がすべて顔に出るため、周囲からは「わかりやすい人」として愛されています。",
+        "social_style": "【対人スタイル：巻き込み型カリスマ】\n誰に対してもオープンマインドで、裏表のない性格は多くの人を惹きつけます。沈んでいる人を強引に外へ連れ出し、豪快に笑い飛ばして元気づけるような、圧倒的な陽のエネルギーを持っています。\n一方で、自分の話をするのが大好きで、相手の話を聞いているようで聞いていない「ジャイアン」的な側面も。自分の興味がある話題には食いつきますが、そうでないと露骨に退屈そうな顔をします。しかし、その自己中心性すらも「まあ、あの人だから仕方ないか」と許させてしまう愛嬌こそが、あなたの最大の武器です。",
         "inner_drive": "【本音と欠点：承認への渇望】\nあなたの行動の原動力は、シンプルに「見てほしい」「褒めてほしい」という承認欲求です。注目されないことは、あなたにとって存在していないも同然です。\n愛すべき欠点は、その「驚くべき飽きっぽさ」です。昨日まで「一生の趣味にする！」と熱中していた道具が、今日はもう部屋の隅で埃を被っている。その子供のような移り気さは、周囲を呆れさせつつも、常に新しい風を運んできます。",
         "shadow_phase": "【ストレス反応：極端な無気力】\n普段の明るさが嘘のように、電池が切れたように落ち込みます。「もうダメだ、終わった」と大げさに騒ぎ立てますが、それは「そんなことないよ」と慰めてほしいサインでもあります。批判されると過剰に反応し、一時的に攻撃的になりますが、一晩寝ると忘れていることが多いのも特徴です。",
         "trivia": [
@@ -227,14 +208,18 @@ DIAGNOSIS_CONTENT = {
             "長文の説明書は、最初の3行しか読まない",
             "買ったばかりの服を、その日に着て帰る"
         ],
-        "golden_rule_long": "『継続』こそが、最大のエンターテインメント。\nあなたの爆発力は最強ですが、持続力がありません。飽きてからが本当の勝負。「あと一歩」踏ん張るだけで、あなたは単なる「一発屋」ではなく、時代を作る「レジェンド」になれます。"
+        "impression_good": ["裏表がなく付き合いやすい", "行動力と決断力がある", "場を明るくするムードメーカー"],
+        "impression_bad": ["自己中心的で話を聞かない", "熱しやすく冷めやすい", "デリカシーがない"],
+        "golden_rule_long": "『継続』こそが、最大のエンターテインメント。\nあなたの爆発力は最強ですが、持続力がありません。飽きてからが本当の勝負。「あと一歩」踏ん張るだけで、あなたは単なる「一発屋」ではなく、時代を作る「レジェンド」になれます。",
+        "cta_text": COMMON_CTA
     },
-    3: { # Type 4: 丁 (THE MUSE)
+    3: { # Type 4: 丁
         "name": "熱き夢想家 (THE MUSE)",
+        "color": "#C62828", # Fire Engine Red
         "catch": "静寂に燃える、知性の灯火",
-        "intro": "あなたは、夜空に浮かぶ月や、暗闇で揺れる蝋燭の炎のように、静かでミステリアスな引力を持つ人です。大声で自己主張することはありませんが、その内側には、誰よりも激しい情熱と、鋭い反骨精神、そして独自の美学が渦巻いています。多くの人が見過ごすような些細な変化や、言葉の裏にある感情を読み取る洞察力を持ち、組織においては「静かなる参謀」や「孤高のクリエイター」として一目置かれる存在です。",
-        "social_style": "【対人スタイル：狭く深く、濃密に】\nあなたは「量」より「質」の人間関係を求めます。表面的な付き合いや、中身のない世間話は時間の無駄だと感じています。心を許した少数の相手とは、夜通し人生や哲学について語り合うような濃密な関係を築きます。\n一方で、一度「敵」とみなした相手には、表向きは穏やかに接しながらも、心の中で静かにシャッターを下ろし、永久にアクセス禁止にする冷徹さを持っています。",
-        "inner_drive": "【本音と欠点：理解への渇望】\nあなたが最も恐れているのは「ありきたりな人間だと思われること」です。「変わってるね」はあなたにとって最高の褒め言葉です。\n愛すべき欠点は、めんどくさいほどの「察してちゃん」気質。「言わなくてもわかってよ」というオーラを出し、相手が気づかないと勝手に傷ついて殻に閉じこもる。その繊細で手のかかる部分は、理解者にとってはたまらない魅力となります。",
+        "intro": "あなたは、夜空に浮かぶ月や、暗闇で揺れる蝋燭の炎のように、静かでミステリアスな引力を持つ人です。大声で自己主張することはありませんが、その内側には、誰よりも激しい情熱と、鋭い反骨精神、そして独自の美学が渦巻いています。多くの人が見過ごすような些細な変化や、言葉の裏にある感情を読み取る洞察力を持ち、組織においては「静かなる参謀」や「孤高のクリエイター」として一目置かれる存在です。あなたの放つ言葉には、人をハッとさせる魔力があります。",
+        "social_style": "【対人スタイル：狭く深く、濃密に】\nあなたは「量」より「質」の人間関係を求めます。表面的な付き合いや、中身のない世間話は時間の無駄だと感じています。心を許した少数の相手とは、夜通し人生や哲学について語り合うような濃密な関係を築きます。\n一方で、一度「敵」とみなした相手には、表向きは穏やかに接しながらも、心の中で静かにシャッターを下ろし、永久にアクセス禁止にする冷徹さを持っています。その境界線は非常にシビアで、一度外された人が戻れることは稀です。",
+        "inner_drive": "【本音と欠点：理解への渇望と選民意識】\nあなたが最も恐れているのは「ありきたりな人間だと思われること」です。「変わってるね」はあなたにとって最高の褒め言葉であり、凡人扱いされることを嫌います。\n愛すべき欠点は、めんどくさいほどの「察してちゃん」気質。「言わなくてもわかってよ」というオーラを出し、相手が気づかないと勝手に傷ついて殻に閉じこもる。その繊細で手のかかる部分は、理解者にとってはたまらない魅力となります。",
         "shadow_phase": "【ストレス反応：疑心暗鬼と攻撃】\nストレスが極限に達すると、被害妄想が膨らみます。「あの人のあの一言は、私への当てつけに違いない」とネガティブな深読みをし、周囲を敵視します。また、溜め込んだ感情が爆発すると、過去の恨みつらみを理路整然と並べ立て、相手を精神的に追い詰める怖さがあります。",
         "trivia": [
             "深夜に書いたポエムのようなLINEを、翌朝消したくなる",
@@ -243,13 +228,17 @@ DIAGNOSIS_CONTENT = {
             "10年前に言われた嫌な一言を、一字一句覚えている",
             "占いや心理テストの結果を、こっそり信じている"
         ],
-        "golden_rule_long": "『言葉にする』手間を、惜しんではならない。\nあなたの繊細な感性は素晴らしいですが、テレパシーは使えません。察してほしいと願う前に、泥臭く言葉で伝える努力をすることで、あなたの孤独な世界は、多くの人に愛される共感の庭になります。"
+        "impression_good": ["思慮深く知的な雰囲気", "独特の世界観とセンス", "本質を突く鋭さがある"],
+        "impression_bad": ["何を考えているか不明", "気難しく近寄りがたい", "急に不機嫌になる"],
+        "golden_rule_long": "『言葉にする』手間を、惜しんではならない。\nあなたの繊細な感性は素晴らしいですが、テレパシーは使えません。察してほしいと願う前に、泥臭く言葉で伝える努力をすることで、あなたの孤独な世界は、多くの人に愛される共感の庭になります。",
+        "cta_text": COMMON_CTA
     },
-    4: { # Type 5: 戊 (THE ANCHOR)
+    4: { # Type 5: 戊
         "name": "不動の守護神 (THE ANCHOR)",
+        "color": "#F9A825", # Dark Yellow
         "catch": "すべてを受け入れる、揺るがぬ巨塔",
-        "intro": "あなたは、雄大な山のように、そこに存在するだけで周囲に安心感を与える「器の大きい」人物です。細かいことには動じず、来るもの拒まずの姿勢で、清濁併せ呑む包容力を持っています。自分からガツガツ動くことは少ないですが、どっしりと構えているだけで自然と人やお金が集まってくる、生まれながらの「社長・オーナー」のような風格を漂わせています。",
-        "social_style": "【対人スタイル：受け身の信頼】\nあなたは基本的に「聞き役」です。相談事をされると、ただ「うんうん」と頷いているだけで、相手が勝手に癒やされ、解決した気になって帰っていくような不思議な力があります。\nしかし、自分のテリトリーやペースを乱されることを極端に嫌います。普段は温厚ですが、自分の流儀を強引に変えようとする相手には、テコでも動かない頑固さで対抗し、無言の圧力で撃退します。",
+        "intro": "あなたは、雄大な山のように、そこに存在するだけで周囲に安心感を与える「器の大きい」人物です。細かいことには動じず、来るもの拒まずの姿勢で、清濁併せ呑む包容力を持っています。自分からガツガツ動くことは少ないですが、どっしりと構えているだけで自然と人やお金が集まってくる、生まれながらの「社長・オーナー」のような風格を漂わせています。変化の激しい現代において、あなたの変わらぬ安定感は、迷える人々の道しるべとなります。",
+        "social_style": "【対人スタイル：受け身の信頼】\nあなたは基本的に「聞き役」です。相談事をされると、ただ「うんうん」と頷いているだけで、相手が勝手に癒やされ、解決した気になって帰っていくような不思議な力があります。\nしかし、自分のテリトリーやペースを乱されることを極端に嫌います。普段は温厚ですが、自分の流儀を強引に変えようとする相手には、テコでも動かない頑固さで対抗し、無言の圧力で撃退します。一度「No」と言ったら、二度と意見を覆さない頑なさがあります。",
         "inner_drive": "【本音と欠点：変化への恐怖】\nあなたの安定感の裏には、「変わることへの面倒くささ」や「現状維持への執着」があります。リスクを冒して新しいことに挑戦するよりは、今の確実な利益を守りたいというのが本音です。\n愛すべき欠点は、その「腰の重さ」です。周りが「早くして！」と焦っていても、あなただけワンテンポ遅れて動いている。そのマイペースさは、時として周囲をイライラさせますが、パニック時には最強の安定剤となります。",
         "shadow_phase": "【ストレス反応：完全な閉鎖】\n許容量を超えると、あなたは外界との接触を完全に遮断します。殻に閉じこもり、電話にも出ず、誰の言葉も耳に入らなくなります。それは、あなたが「最後の砦」として一人ですべてを抱え込みすぎた反動であり、動かざる山が噴火する前兆でもあります。",
         "trivia": [
@@ -259,13 +248,18 @@ DIAGNOSIS_CONTENT = {
             "動き出すまでに時間がかかるが、一度動くと止まらない",
             "「昔は良かった」と、つい口にしてしまう"
         ],
-        "golden_rule_long": "『とりあえずやってみる』精神を、意図的に持て。\nあなたの慎重さは武器ですが、時には足枷になります。考えすぎる前に、まず靴を履いて外に出る。その一歩の軽やかさを身につければ、あなたの圧倒的な実力は、さらに広い世界で輝きます。"
+        "impression_good": ["一緒にいると安心する", "頼りがいと包容力がある", "感情的にならず冷静"],
+        "impression_bad": ["頑固で融通が利かない", "腰が重く行動が遅い", "何を考えているかわからない"],
+        "golden_rule_long": "『とりあえずやってみる』精神を、意図的に持て。\nあなたの慎重さは武器ですが、時には足枷になります。考えすぎる前に、まず靴を履いて外に出る。その一歩の軽やかさを身につければ、あなたの圧倒的な実力は、さらに広い世界で輝きます。",
+        "cta_text": COMMON_CTA
     },
-    5: { # Type 6: 己 (THE NURTURER)
+
+    5: { # Type 6: 己
         "name": "尽くす世話焼き (THE NURTURER)",
+        "color": "#F9A825", # Dark Yellow
         "catch": "才ある者を育む、慈愛の大地",
-        "intro": "あなたは、豊かな土壌が作物を育てるように、他人の才能を見抜き、慈しみ、開花させる天性の「育成者」です。困っている人を見ると放っておけず、つい手を差し伸べてしまう母性的な優しさを持っています。自分自身が脚光を浴びることよりも、あなたが育てた誰かが成功し、輝く姿を見ることに無上の喜びを感じる、究極のサポーター気質と言えるでしょう。",
-        "social_style": "【対人スタイル：過干渉な愛】\n「大丈夫？」「ご飯食べた？」と、常に周囲を気にかけるあなたの周りには、自然と人が集まります。複雑なことを噛み砕いて教えるのが上手く、チームの教育係や相談役として絶大な信頼を得ます。\nしかし、その愛は時として「重たい」ものになりがちです。良かれと思って先回りしすぎたり、相手の課題まで肩代わりしてしまったりすることで、無意識のうちに相手の自立心を奪い、「あなたなしでは生きられない人（ダメンズ）」を量産してしまう傾向があります。",
+        "intro": "あなたは、豊かな土壌が作物を育てるように、他人の才能を見抜き、慈しみ、開花させる天性の「育成者」です。困っている人を見ると放っておけず、つい手を差し伸べてしまう母性的な優しさを持っています。自分自身が脚光を浴びることよりも、あなたが育てた誰かが成功し、輝く姿を見ることに無上の喜びを感じる、究極のサポーター気質と言えるでしょう。その献身的な姿勢は、組織において「なくてはならない空気」のような存在感を放っています。",
+        "social_style": "【対人スタイル：過干渉な愛】\n「大丈夫？」「ご飯食べた？」と、常に周囲を気にかけるあなたの周りには、自然と人が集まります。複雑なことを噛み砕いて教えるのが天才的に上手く、チームの教育係やメンターとして絶大な信頼を得ます。\nしかし、その愛は時として「重たい」ものになりがちです。良かれと思って先回りしすぎたり、相手の課題まで肩代わりしてしまったりすることで、無意識のうちに相手の自立心を奪い、「あなたなしでは生きられない人（ダメンズ）」を量産してしまう傾向があります。",
         "inner_drive": "【本音と欠点：感謝への渇望】\nあなたの献身の裏には、「必要とされたい」という強い承認欲求があります。「誰かの役に立っている」という実感が、あなたのアイデンティティそのものなのです。\n愛すべき欠点は、見返りがないと途端に不機嫌になる「恩着せがましさ」です。「あんなにしてあげたのに」と過去の献身を持ち出して愚痴をこぼす姿は、人間臭くもあり、あなたの愛がいかに情熱的であったかの証明でもあります。",
         "shadow_phase": "【ストレス反応：愚痴と干渉】\n精神的に追い詰められると、視野が狭くなり、細かいことへの干渉が激しくなります。「私の言う通りにすればいいのよ」と相手をコントロールしようとしたり、周囲への不満や愚痴が止まらなくなったりします。愛が執着へと変わり、泥沼化する前に距離を置く必要があります。",
         "trivia": [
@@ -275,10 +269,14 @@ DIAGNOSIS_CONTENT = {
             "サプライズをするのは好きだが、されるとリアクションに困る",
             "「私がいないとダメね」と言いながら、実は嬉しそう"
         ],
-        "golden_rule_long": "『手放す愛』を、勇気を持って知れ。\n手を貸すことだけが愛ではありません。時には突き放し、転ぶのを見守る勇気を持つこと。相手の力を信じて「何もしない」という選択ができた時、あなたは依存関係を超えた、真の教育者へと進化します。"
+        "impression_good": ["面倒見が良く優しい", "教え方がわかりやすい", "細やかな気配りができる"],
+        "impression_bad": ["お節介で過干渉", "恩着せがましい", "愚痴っぽい"],
+        "golden_rule_long": "『手放す愛』を、勇気を持って知れ。\n手を貸すことだけが愛ではありません。時には突き放し、転ぶのを見守る勇気を持つこと。相手の力を信じて「何もしない」という選択ができた時、あなたは依存関係を超えた、真の教育者へと進化します。",
+        "cta_text": COMMON_CTA
     },
-    6: { # Type 7: 庚 (THE HERO)
+    6: { # Type 7: 庚
         "name": "正義の切り込み隊長 (THE HERO)",
+        "color": "#546E7A", # Silver/Blue Grey
         "catch": "時代を切り拓く、鋼の革命家",
         "intro": "あなたは、切れ味鋭い日本刀のように、停滞した空気を一撃で切り裂く「変革者」です。「長いものに巻かれる」という発想が皆無で、誰もが言いにくいことでも「それはおかしい」と堂々と声を上げる強さを持っています。そのスピード感と決断力は、硬直した組織や古い慣習を打ち破るための、最強の武器となります。敵も作りますが、それ以上に熱狂的な信者を生むカリスマです。",
         "social_style": "【対人スタイル：直球勝負】\n嘘や駆け引きが大嫌いで、常に本音でぶつかります。結論のないダラダラした会話には露骨に退屈な顔をし、「で、結論は？」と急かしてしまうことも。\nあなたの言葉には裏表がないため、サッパリとした気持ちの良い付き合いができますが、デリカシーのなさも天下一品です。悪気なく相手の痛いところを突き、場を凍らせてから「あれ、言い過ぎた？」と気づく、不器用な愛嬌があります。",
@@ -291,10 +289,14 @@ DIAGNOSIS_CONTENT = {
             "お世辞を言われても「何が狙いだ？」と疑う",
             "即断即決すぎて、後でたまに後悔する"
         ],
-        "golden_rule_long": "『剣を収める』美学を、身につけよ。\nあなたの鋭さは誰もが認めています。だからこそ、あえてその剣を抜かずに、言葉と態度で相手を納得させる包容力を身につけた時、あなたは単なる「暴れん坊」から、時代を創る「英雄」になります。"
+        "impression_good": ["裏表がなく信頼できる", "決断が早くて頼もしい", "正義感が強い"],
+        "impression_bad": ["デリカシーがない", "攻撃的で怖い", "人の話を聞かない"],
+        "golden_rule_long": "『剣を収める』美学を、身につけよ。\nあなたの鋭さは誰もが認めています。だからこそ、あえてその剣を抜かずに、言葉と態度で相手を納得させる包容力を身につけた時、あなたは単なる「暴れん坊」から、時代を創る「英雄」になります。",
+        "cta_text": COMMON_CTA
     },
-    7: { # Type 8: 辛 (THE IDOL)
+    7: { # Type 8: 辛
         "name": "繊細な宝石 (THE IDOL)",
+        "color": "#546E7A", # Silver/Blue Grey
         "catch": "試練を輝きに変える、美しきカリスマ",
         "intro": "あなたは、泥の中から掘り出され、磨かれることで輝きを放つ宝石のように、特別なオーラを纏った人です。生まれながらにして「その他大勢」とは違う気品や美意識を持っており、俗世間の雑多なものとは一線を画しています。試練や苦労が多い人生かもしれませんが、それを乗り越えるたびに人間的な深みと魅力が増し、人々を魅了するカリスマへと成長していきます。",
         "social_style": "【対人スタイル：高貴な選民】\nプライドが高く、自分を安売りしません。誰とでも仲良くするわけではなく、自分の美意識に敵う相手だけをテリトリーに入れます。\n一方で、心を許した相手には非常に甘えん坊で、ワガママな一面を見せます。「私のことを一番に扱ってほしい」という願望が強く、少しでも蔑ろにされると、この世の終わりのように傷つき、殻に閉じこもってしまいます。",
@@ -307,10 +309,14 @@ DIAGNOSIS_CONTENT = {
             "自分へのご褒美（スイーツや服）が多すぎる",
             "プライドが高すぎて、謝るのが死ぬほど下手"
         ],
-        "golden_rule_long": "『傷』を『勲章』に、変える強さを持て。\n傷つくことを恐れないでください。原石は削られなければ輝きません。辛い経験やコンプレックスさえも、あなたという物語を彩るスパイスとして愛せた時、あなたは誰よりも美しく輝きます。"
+        "impression_good": ["センスが良く洗練されている", "プロ意識が高い", "独特のカリスマ性がある"],
+        "impression_bad": ["プライドが高くて面倒", "傷つきやすく扱いづらい", "ワガママなお姫様・王子様"],
+        "golden_rule_long": "『傷』を『勲章』に、変える強さを持て。\n傷つくことを恐れないでください。原石は削られなければ輝きません。辛い経験やコンプレックスさえも、あなたという物語を彩るスパイスとして愛せた時、あなたは誰よりも美しく輝きます。",
+        "cta_text": COMMON_CTA
     },
-    8: { # Type 9: 壬 (THE NOMAD)
+    8: { # Type 9: 壬
         "name": "自由な冒険家 (THE NOMAD)",
+        "color": "#1565C0", # Dark Blue
         "catch": "境界を超えて流れる、自由の象徴",
         "intro": "あなたは、留まることを知らない大河や、大海原のように、圧倒的なスケールと流動性を持った自由人です。既存の枠組みや常識に囚われず、常に新しい世界、新しい価値観を求めて彷徨っています。「普通はこうする」という言葉は、あなたにとっては何の意味も持ちません。そのダイナミックな生き様と、夢を語るロマンチストな一面は、多くの人を惹きつけ、新しい風を吹き込みます。",
         "social_style": "【対人スタイル：来る者拒まず去る者追わず】\n誰とでもフランクに接し、すぐに打ち解けるコミュニケーション能力を持っています。しかし、誰か一人に執着することはなく、風のように現れては去っていきます。\n「束縛」を何よりも嫌い、責任や約束で縛られそうになると、本能的に逃げ出します。つかみどころがなく、本心がどこにあるのか誰にも（自分でも）わからないミステリアスな魅力があります。",
@@ -323,10 +329,14 @@ DIAGNOSIS_CONTENT = {
             "束縛の激しい恋人とは3日で別れる自信がある",
             "知的好奇心は凄まじいが、持続力は3日坊主"
         ],
-        "golden_rule_long": "『帰る場所』を、一つだけ作れ。\n自由であることと、根無し草であることは違います。どんなに遠くへ行っても、そこに戻れば自分らしくいられる「港（パートナーや拠点）」を持つことで、あなたの航海はより遠くまで、より安全に続くようになります。"
+        "impression_good": ["スケールが大きく夢がある", "一緒にいるとワクワクする", "発想が柔軟"],
+        "impression_bad": ["無責任でルーズ", "何を考えているかわからない", "すぐに逃げる"],
+        "golden_rule_long": "『帰る場所』を、一つだけ作れ。\n自由であることと、根無し草であることは違います。どんなに遠くへ行っても、そこに戻れば自分らしくいられる「港（パートナーや拠点）」を持つことで、あなたの航海はより遠くまで、より安全に続くようになります。",
+        "cta_text": COMMON_CTA
     },
-    9: { # Type 10: 癸 (THE COUNSELOR)
+    9: { # Type 10: 癸
         "name": "癒やしの共感者 (THE COUNSELOR)",
+        "color": "#1565C0", # Dark Blue
         "catch": "静かに浸透する、慈愛の賢者",
         "intro": "あなたは、大地を潤す雨や霧のように、静かに周囲に浸透し、人々の心に寄り添う癒やしの存在です。派手な自己主張はしませんが、驚くほどの知識と知恵を蓄えており、物事の裏側や人の本質を冷静に見抜いています。他人の痛みや悲しみを、まるで自分のことのように感じる共感能力（エンパス）を持っており、傷ついた人々が最後に辿り着く「避難所」のような役割を果たします。",
         "social_style": "【対人スタイル：同調と献身】\nあなたは「水」のように、相手の形に合わせて自分を変えることができます。攻撃的な人の前では受け流し、悲しむ人の前では共に泣く。その柔軟性は組織の潤滑油として重宝されます。\nしかし、自分の意見を飲み込み、ニコニコしてやり過ごすことが多いため、ストレスを内側に溜め込みがちです。表面上は穏やかですが、内面では冷静に相手を分析し、評価を下しているシビアな一面もあります。",
@@ -339,15 +349,18 @@ DIAGNOSIS_CONTENT = {
             "「何でもいいよ」と言うときは、本当に何でもいい",
             "実は、かなりマニアックなオタク趣味がある"
         ],
-        "golden_rule_long": "『自分』という器を、意識的に持て。\n水は器によって形を変えますが、あなた自身の形も大切にしてください。「私はこう思う」「私はこれが嫌だ」という核を持つことで、あなたは周囲に流されるだけでなく、自らの意思で大河のような流れを作れる賢者になります。"
+        "impression_good": ["聞き上手で癒やされる", "知識が豊富で賢い", "空気が読める"],
+        "impression_bad": ["本音が見えない", "ネガティブで暗い", "急に心を閉ざす"],
+        "golden_rule_long": "『自分』という器を、意識的に持て。\n水は器によって形を変えますが、あなた自身の形も大切にしてください。「私はこう思う」「私はこれが嫌だ」という核を持つことで、あなたは周囲に流されるだけでなく、自らの意思で大河のような流れを作れる賢者になります。",
+        "cta_text": COMMON_CTA
     }
 }
-# --- 占術パラメータ定数（これを追加してください） ---
+
+# --- 占術パラメータ定数（変更なし） ---
 GAN_ELEMENTS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
 GAN_FIVE = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4] 
 ZHI_FIVE = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4] 
 SOLAR_TERMS = [6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7] 
-
 ENERGY_STRENGTH = [
     [3, 2, 3, 3, 2, 1, 1, 1, 1, 1, 2, 3], [3, 2, 3, 3, 2, 1, 1, 1, 1, 1, 2, 3],
     [1, 1, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1], [1, 1, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1],
@@ -355,19 +368,14 @@ ENERGY_STRENGTH = [
     [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1], [1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 2, 1],
     [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3], [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3]
 ]
-
 COMPATIBILITY_MAP = {
-    0: ["No.6 尽くす世話焼き", "No.7 正義の切り込み隊長", "No.4 熱き夢想家"], 
-    1: ["No.7 正義の切り込み隊長", "No.8 繊細な宝石", "No.3 天性の主人公"],
-    2: ["No.8 繊細な宝石", "No.9 自由な冒険家", "No.5 不動の守護神"], 
-    3: ["No.9 自由な冒険家", "No.10 癒やしの共感者", "No.6 尽くす世話焼き"],
-    4: ["No.10 癒やしの共感者", "No.1 頼れる親分肌", "No.7 正義の切り込み隊長"], 
-    5: ["No.1 頼れる親分肌", "No.2 愛され調整役", "No.8 繊細な宝石"],
-    6: ["No.2 愛され調整役", "No.3 天性の主人公", "No.9 自由な冒険家"], 
-    7: ["No.3 天性の主人公", "No.4 熱き夢想家", "No.10 癒やしの共感者"],
-    8: ["No.4 熱き夢想家", "No.5 不動の守護神", "No.1 頼れる親分肌"], 
-    9: ["No.5 不動の守護神", "No.6 尽くす世話焼き", "No.2 愛され調整役"]
+    0: ["No.6 尽くす世話焼き", "No.7 正義の切り込み隊長", "No.4 熱き夢想家"], 1: ["No.7 正義の切り込み隊長", "No.8 繊細な宝石", "No.3 天性の主人公"],
+    2: ["No.8 繊細な宝石", "No.9 自由な冒険家", "No.5 不動の守護神"], 3: ["No.9 自由な冒険家", "No.10 癒やしの共感者", "No.6 尽くす世話焼き"],
+    4: ["No.10 癒やしの共感者", "No.1 頼れる親分肌", "No.7 正義の切り込み隊長"], 5: ["No.1 頼れる親分肌", "No.2 愛され調整役", "No.8 繊細な宝石"],
+    6: ["No.2 愛され調整役", "No.3 天性の主人公", "No.9 自由な冒険家"], 7: ["No.3 天性の主人公", "No.4 熱き夢想家", "No.10 癒やしの共感者"],
+    8: ["No.4 熱き夢想家", "No.5 不動の守護神", "No.1 頼れる親分肌"], 9: ["No.5 不動の守護神", "No.6 尽くす世話焼き", "No.2 愛され調整役"]
 }
+
 # ==========================================
 # 4. Logic Engines (Fortune & Science)
 # ==========================================
@@ -404,6 +412,7 @@ class FortuneEngineIntegrated:
         return (10 + days_diff) % 60
 
     def get_month_pillar(self, year, month, day):
+        # SOLAR_TERMSはPart 3で定義済み
         is_after_setsuiri = day >= SOLAR_TERMS[month - 1]
         year_gan_idx = (year - 3) % 10
         month_base_map = {0: 2, 1: 2, 2: 4, 3: 4, 4: 6, 5: 6, 6: 8, 7: 8, 8: 0, 9: 0}
@@ -459,7 +468,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. Main UI Application (Reading Mode)
+# 5. Main UI Application (Reading Mode with Colors)
 # ==========================================
 
 st.title("Project MAP")
@@ -483,11 +492,11 @@ with main_tab:
         for q_id, q_text in TIPI_QUESTIONS.items():
             st.markdown(f"**{q_text}**")
             tipi_answers[q_id] = st.slider("", 1, 7, 4, key=f"f_{q_id}", label_visibility="collapsed")
-            st.markdown("") # Spacer
+            st.markdown("") 
             
         submitted = st.form_submit_button("診断結果を読む", type="primary", use_container_width=True)
     
-    # B. 結果表示 (Reading Mode)
+    # B. 結果表示 (Colored Reading Mode)
     if submitted:
         try:
             date_obj = datetime.date(year, month, day)
@@ -501,50 +510,83 @@ with main_tab:
             fate_scores = result['scores']
             fate_code = result['fate_code']
             
+            # テーマカラー取得
+            theme_color = content.get('color', '#333333')
+            
             # Big Five & Gap
             _, big5_norm = calculate_big5(tipi_answers)
             hook_text = analyze_big5_gap(big5_norm, gan_id)
 
-            # === HERO SECTION ===
-            st.markdown('<div class="read-card type-header">', unsafe_allow_html=True)
-            st.markdown(f"<div class='type-sub'>FATE CODE: {fate_code}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='type-main'>{content['name']}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='hero-copy'>{content['catch']}</div>", unsafe_allow_html=True)
+            # === HERO SECTION (Color Themed) ===
+            # 動的CSSでテーマカラーを適用
+            st.markdown(f"""
+            <div class="read-card type-header" style="border-top: 10px solid {theme_color};">
+                <div class='type-sub' style='color:{theme_color};'>FATE CODE: {fate_code}</div>
+                <div class='type-main' style='color:{theme_color};'>{content['name']}</div>
+                <div class='hero-copy' style='color:#555;'>{content['catch']}</div>
+            """, unsafe_allow_html=True)
             
             img_path = load_image(gan_id + 1)
-            if img_path: st.image(img_path, use_container_width=True)
-            else: st.image("https://placehold.co/400x400/F0F0F0/333?text=No+Image", use_container_width=True)
+            col_img1, col_img2, col_img3 = st.columns([1, 2, 1])
+            with col_img2:
+                if img_path: st.image(img_path, use_container_width=True)
+                else: st.image("https://placehold.co/400x400/F0F0F0/333?text=No+Image", use_container_width=True)
+            
             st.markdown('</div>', unsafe_allow_html=True)
 
             # === STORY SECTION (読み物エリア) ===
             st.markdown('<div class="read-card">', unsafe_allow_html=True)
             
             # 序文
-            st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px;'>{content['intro']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
             st.markdown("---")
 
             # 1. 対人スタイル
-            st.markdown("<h3>① 対人関係のスタイル</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>① 対人関係のスタイル</h3>", unsafe_allow_html=True)
             st.write(content['social_style'])
 
             # 2. 隠された本音
-            st.markdown("<h3>② 隠された本音と欠点</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>② 隠された本音と欠点</h3>", unsafe_allow_html=True)
             st.write(content['inner_drive'])
 
             # 3. ストレス時の影
-            st.markdown("<h3>③ ストレス時の『影』</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>③ ストレス時の『影』</h3>", unsafe_allow_html=True)
             st.write(content['shadow_phase'])
 
+            # --- NEW: 周囲からの評価 (Impression) ---
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>④ 周囲からの評価</h3>", unsafe_allow_html=True)
+            
+            col_good, col_bad = st.columns(2)
+            with col_good:
+                st.markdown(f"""
+                <div class="impression-box" style="background-color: {theme_color}10; border: 1px solid {theme_color}40;">
+                    <span class="impression-title" style="color:{theme_color};">👍 良い評価</span>
+                    <ul class="impression-list">
+                        {''.join([f'<li>{item}</li>' for item in content['impression_good']])}
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col_bad:
+                st.markdown(f"""
+                <div class="impression-box" style="background-color: #F5F5F5; border: 1px solid #ddd;">
+                    <span class="impression-title" style="color:#666;">👎 悪い評価</span>
+                    <ul class="impression-list">
+                        {''.join([f'<li>{item}</li>' for item in content['impression_bad']])}
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
+            
             # 4. あるあるチェックリスト
-            st.markdown("<h3>④ あなたの『あるある』</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>⑤ あなたの『あるある』</h3>", unsafe_allow_html=True)
             st.markdown('<div class="trivia-box">', unsafe_allow_html=True)
             for t in content['trivia']:
-                st.markdown(f"<div class='trivia-item'><span class='trivia-icon'>✔</span> {t}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='trivia-item'><span class='trivia-icon' style='color:{theme_color};'>✔</span> {t}</div>", unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
             # 5. 処方箋
             st.markdown(f"""
-            <div class='prescription-box'>
+            <div class='prescription-box' style='background: {theme_color};'>
                 <div class='rule-title'>GOLDEN RULE</div>
                 <div class='rule-text'>{content['golden_rule_long']}</div>
             </div>
@@ -552,28 +594,23 @@ with main_tab:
             st.markdown('</div>', unsafe_allow_html=True)
 
             # === ANALYSIS SECTION (寸止め・Lock) ===
-            st.markdown("<h3>📊 現在の科学的分析</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='border-bottom: 3px solid {theme_color};'>📊 現在の科学的分析</h3>", unsafe_allow_html=True)
             
-            # フック文章
-            if "注意" in hook_text:
-                st.error(hook_text)
-            else:
-                st.success(hook_text)
+            if "注意" in hook_text: st.error(hook_text)
+            else: st.success(hook_text)
             
             # ロックされたカード
             st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
             
-            # ぼかされた中身
             st.markdown('<div class="blurred-content">', unsafe_allow_html=True)
             categories = ['外向性', '開放性', '協調性', '勤勉性', '安定性']
             fig = go.Figure()
-            # ダミーデータで雰囲気だけ見せる
-            fig.add_trace(go.Scatterpolar(r=[3,4,2,5,3], theta=categories, fill='toself', name='Current'))
+            fig.add_trace(go.Scatterpolar(r=[3,4,3,4,3], theta=categories, fill='toself', line_color=theme_color))
             fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), height=300)
             st.plotly_chart(fig, use_container_width=True)
-            st.write("ここにはあなたの現在の精神状態、ストレスレベル、そして運命とのギャップについての詳細な分析が表示されます。" * 3)
+            st.write("詳細な分析結果..." * 10)
             st.markdown('</div>', unsafe_allow_html=True)
-
+            
             # オーバーレイ (CTA)
             st.markdown(f"""
             <div class="lock-overlay">
@@ -586,7 +623,6 @@ with main_tab:
             </div>
             """, unsafe_allow_html=True)
             
-            # ボタンはオーバーレイの外（クリック可能エリア）に配置
             st.link_button("LINEで完全版レポートを読む (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -599,11 +635,12 @@ with catalog_tab:
     cols = st.columns(2)
     for i in range(10):
         c = DIAGNOSIS_CONTENT[i]
+        c_color = c.get('color', '#333')
         with cols[i % 2]:
-            st.markdown('<div class="read-card" style="padding:15px; text-align:center; margin-bottom:15px;">', unsafe_allow_html=True)
+            st.markdown(f'<div class="read-card" style="padding:15px; text-align:center; margin-bottom:15px; border-top: 5px solid {c_color};">', unsafe_allow_html=True)
             img_path = load_image(i + 1)
             if img_path: st.image(img_path, use_container_width=True)
             else: st.image("https://placehold.co/200x200/F0F0F0/333?text=No+Image", use_container_width=True)
-            st.markdown(f"**{c['name']}**")
+            st.markdown(f"<div style='font-weight:bold; color:{c_color};'>{c['name']}</div>", unsafe_allow_html=True)
             st.caption(c['catch'])
             st.markdown('</div>', unsafe_allow_html=True)
