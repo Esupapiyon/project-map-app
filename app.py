@@ -555,11 +555,12 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (共通表示ロジック)
+# 5. UI Component Function (共通表示ロジック・修正版)
 # ==========================================
-def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False):
+def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
     診断結果と図鑑で共通して使用する表示コンポーネント
+    key_suffix: ループ処理時のID重複を防ぐための一意な文字列
     """
     theme_color = content.get('color', '#333')
     
@@ -574,16 +575,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     phrases_html = "".join([f"<div class='phrase-bubble'>{p}</div>" for p in content['phrases']])
     st.markdown(f"<div class='phrase-container'>{phrases_html}</div>", unsafe_allow_html=True)
     
-    # Image
-    # カタログモードの場合はIDから画像を引く（contentの順番は0始まり、IDは1始まり）
-    # 診断モードの場合は gan_id が渡される前提だが、ここではコンテンツ辞書から逆引きするか、
-    # シンプルに呼び出し元でパス解決済みのIDを使う運用にする。
-    # 簡略化のため、content['name']からType IDを推測または引数で渡すのがベストだが、
-    # ここではファイル名検索ロジックを内包する。
-    
-    # Type IDの特定 (名前に "Type X" が入っていないため、辞書を逆引きするか、呼び出し元で処理)
-    # ここでは呼び出し元で処理済みの画像パスを表示する形にしたいが、関数化のため以下で対応
-    # 簡易的に、DIAGNOSIS_CONTENTのキーと一致する前提でループ検索
+    # Image Logic
     type_id = 1
     for k, v in DIAGNOSIS_CONTENT.items():
         if v['name'] == content['name']:
@@ -623,7 +615,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown(f"<h3 style='border-color:{theme_color};'>④ 周囲からの評判</h3>", unsafe_allow_html=True)
     col_g, col_b = st.columns(2)
     with col_g:
-        # 絵文字削除・テキストのみ
         st.markdown(f"<div class='impression-box impression-good'><b>Good</b><br>{'<br>'.join(['・'+i for i in content['impression_good']])}</div>", unsafe_allow_html=True)
     with col_b:
         st.markdown(f"<div class='impression-box impression-bad'><b>Bad</b><br>{'<br>'.join(['・'+i for i in content['impression_bad']])}</div>", unsafe_allow_html=True)
@@ -638,28 +629,24 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (Chart & Gap) ---
-    # カタログモードでは「科学的分析」は表示しない（ユーザーデータがないため）
-    # ただし、宿命のパラメータチャートだけは表示する
-    
     st.markdown(f"<h3 style='border-color:{theme_color};'>📊 現在の性格分析</h3>", unsafe_allow_html=True)
     
-    # フック文章 (診断時のみ)
+    # フック文章
     if not is_catalog and big5_norm:
-        hook_text = analyze_big5_gap(big5_norm, type_id - 1) # type_id is 1-based
+        hook_text = analyze_big5_gap(big5_norm, type_id - 1)
         if "注意" in hook_text: st.error(hook_text)
         else: st.success(hook_text)
     elif is_catalog:
         st.info("※ ここには、あなたの現在の状態と宿命のギャップが表示されます（診断時のみ）")
 
-    # チャートエリア (寸止め風)
+    # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
     
     # チャート描画
     categories = ['外向性', '開放性', '協調性', '勤勉性', '安定性']
     fig = go.Figure()
     
-    # 宿命 (Orange) - 常に表示
-    # fate_scoresの値 (1-5) をリスト化
+    # 宿命 (Orange)
     f_vals = [fate_scores['Identity'], fate_scores['Create'], fate_scores['Economy'], fate_scores['Status'], fate_scores['Vitality']]
     fig.add_trace(go.Scatterpolar(r=f_vals, theta=categories, fill='toself', name='宿命', line_color='#E65100'))
     
@@ -668,7 +655,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         s_vals = [big5_norm['Extraversion'], big5_norm['Openness'], big5_norm['Agreeableness'], big5_norm['Conscientiousness'], 6 - big5_norm['Neuroticism']]
         fig.add_trace(go.Scatterpolar(r=s_vals, theta=categories, fill='toself', name='現在', line_color='#1A237E'))
     
-    # 背景透過設定 & 文字色調整
+    # 背景透過設定
     fig.update_layout(
         polar=dict(
             radialaxis=dict(visible=True, range=[0, 5], tickfont=dict(color='#999')),
@@ -681,7 +668,9 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font=dict(color='#333')),
         font=dict(color='#333')
     )
-    st.plotly_chart(fig, use_container_width=True, config={'staticPlot': True})
+    
+    # ★修正点: key引数を追加して重複回避
+    st.plotly_chart(fig, use_container_width=True, config={'staticPlot': True}, key=f"radar_{key_suffix}")
 
     # 寸止めテキスト & CTA
     if not is_catalog:
@@ -702,14 +691,13 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         
         st.link_button("LINEで完全版レポートを読む (無料)", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
     else:
-        # カタログ時はロックせず、案内のみ
         st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ==========================================
-# 6. Main UI Application (Ver 10.0)
+# 6. Main UI Application (Ver 10.0 Final)
 # ==========================================
 
 st.title("Project MAP")
@@ -719,7 +707,7 @@ main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
-        # FATE Code 説明 (st.info)
+        # FATE Code 説明
         st.info("""
         **FATE Code（運命の設計図）とは？**
         あなたの行動原理を『Input（情報の取り方）』『Process（判断基準）』『Output（行動特性）』『Drive（原動力）』の4要素で解明するコードです。この「クセ」を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの「勝ちパターン」が見えてきます。
@@ -749,7 +737,6 @@ with main_tab:
             date_obj = datetime.date(year, month, day)
             date_str = date_obj.strftime("%Y/%m/%d")
             
-            # エンジン実行
             engine = FortuneEngineIntegrated()
             result = engine.analyze_basic(date_str)
             gan_id = result['gan']
@@ -760,8 +747,8 @@ with main_tab:
             # Big Five 計算
             _, big5_norm = calculate_big5(tipi_answers)
             
-            # 共通コンポーネントで描画
-            render_result_component(content, fate_code, fate_scores, big5_norm, is_catalog=False)
+            # 共通コンポーネント (key_suffix="main")
+            render_result_component(content, fate_code, fate_scores, big5_norm, is_catalog=False, key_suffix="main")
 
         except ValueError:
             st.error("正しい日付を選択してください。")
@@ -771,19 +758,14 @@ with catalog_tab:
     st.markdown("### 全10タイプ図鑑")
     st.caption("タップして詳細を展開")
     
-    # 共通コンポーネントを再利用して完全統一
     for i in range(10):
         c = DIAGNOSIS_CONTENT[i]
         c_color = c.get('color', '#333')
         
         with st.expander(f"Type {i+1}: {c['name']}"):
-            # カタログ用ダミーデータ生成
-            # FATE Codeは各タイプの代表コードを使用
+            # カタログ用ダミーデータ
             dummy_fate_code = c.get('fate_code_type', 'XXXX')
-            
-            # レーダーチャート用の代表スコア（簡易的にオール3または特徴に合わせて設定可）
-            # ここでは視覚的確認用としてバランス型をセット
             dummy_scores = {'Identity':3, 'Create':3, 'Economy':3, 'Status':3, 'Vitality':3}
             
-            # 共通コンポーネント呼び出し (is_catalog=True)
-            render_result_component(c, dummy_fate_code, dummy_scores, big5_norm=None, is_catalog=True)
+            # ★修正点: ループ回数 i をkey_suffixに渡して一意にする
+            render_result_component(c, dummy_fate_code, dummy_scores, big5_norm=None, is_catalog=True, key_suffix=f"cat_{i}")
