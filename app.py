@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Fixed_HTML)
+# 1. Page Config & CSS (Ver Final_UI_Fixed)
 # ==========================================
 st.set_page_config(
     page_title="Project MAP",
@@ -148,6 +148,43 @@ st.markdown("""
         line-height: 1.6;
     }
     
+    /* CTA・ブラーエリア */
+    .cta-section {
+        background-color: #FAFAFA;
+        border: 2px solid #E0E0E0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-header {
+        font-size: 1.2rem;
+        font-weight: 900;
+        color: #333;
+        margin-bottom: 20px;
+        background: #fff;
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+    }
+    .cta-list {
+        text-align: left;
+        margin: 0 auto 20px auto;
+        display: inline-block;
+        font-weight: bold;
+        line-height: 1.8;
+    }
+    .blurred-content {
+        filter: blur(8px);
+        opacity: 0.7;
+        pointer-events: none;
+        user-select: none;
+        margin: 20px 0;
+    }
+    
     /* ロックオーバーレイ */
     .lock-overlay {
         position: absolute;
@@ -214,7 +251,7 @@ FATE_MEANINGS = {
 # 全タイプ共通CTAテキスト
 COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
 
-# 診断コンテンツ (Ver Final_Fixed_HTML)
+# 診断コンテンツ (Ver Final_UI_Fixed)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
         "name": "鬼軍曹 (THE DRILL SERGEANT)",
@@ -566,7 +603,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_Fixed_HTML)
+# 5. UI Component Function (Ver Final_UI_Fixed)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -574,8 +611,10 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     """
     theme_color = content.get('color', '#333')
     
+    # 修正1: FATE Code説明文をここに移動
+    st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
+    
     # --- 1. HERO SECTION (表の顔) ---
-    # 修正3: タイトルの追加
     st.subheader("【表の顔】社会的役割としてのあなた")
     
     st.markdown(f'<div class="read-card" style="border-top: 10px solid {theme_color};">', unsafe_allow_html=True)
@@ -613,6 +652,9 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # --- 3. STORY SECTION ---
     st.markdown('<div class="read-card">', unsafe_allow_html=True)
     
+    # 修正2: 「表の性格」タイトルの追加
+    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】</h3>", unsafe_allow_html=True)
+    
     st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -645,9 +687,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # --- 4. ANALYSIS SECTION (裏の顔) ---
     st.subheader("【裏の顔】潜在的な本質とズレ")
     
-    # 修正4: 不要な緑ボックス(st.success/st.error)を完全に削除
-    # （ここにあった analyze_big5_gap の結果表示コードを削除）
-
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
     
@@ -691,31 +730,20 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # CTAボタン1
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
-        # 修正1: HTML描画バグの修正 (変数に格納し、markdownでレンダリング)
+        # 修正3: CTAエリアのテキスト化
         cta_html = """
         <div class="cta-section">
             <div class="cta-header">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
+            
             <div class="cta-list">
                 ・【警告】あなたの才能が『自滅』するパターンの特定<br>
                 ・【仕事】『裏の武器』を使って年収を倍にする具体的戦略<br>
                 ・【恋愛】あなたの『本性』を全肯定してくれる運命の相手
             </div>
             
-            <div style="font-weight:bold; margin: 20px 0; border-top:1px dashed #ccc; padding-top:10px;">
-                【相性】全タイプ網羅！『運命の相関マトリクス図』
-            </div>
-            
-            <div class="blurred-content">
-                <table class="matrix-table">
-                    <tr class="matrix-header"><td>Type</td><td>0</td><td>1</td><td>2</td><td>3</td></tr>
-                    <tr><td>0</td><td>◎</td><td>△</td><td>×</td><td>○</td></tr>
-                    <tr><td>1</td><td>△</td><td>○</td><td>◎</td><td>×</td></tr>
-                    <tr><td>2</td><td>×</td><td>◎</td><td>△</td><td>◎</td></tr>
-                </table>
-            </div>
-            
-            <div style="background:#E3F2FD; padding:10px; border-radius:8px; margin: 15px 0; font-size:0.9rem; color:#0D47A1; font-weight:bold;">
-                🎁 【登録特典】あなたの『表と裏』を一枚にまとめた『ステータス診断カード（画像）』を無料プレゼント！ インスタでシェアして、本当の自分を表現しよう。
+            <div style="font-weight:bold; margin: 20px 0; color:#333; text-align:left; line-height:1.8;">
+                ▼ 【相性】全タイプ網羅！『運命の相関マトリクス図』<br>
+                ▼ 【登録特典】あなたの『表と裏』を一枚にまとめた『ステータス診断カード』
             </div>
             
             <div class="blurred-content">
@@ -724,7 +752,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             
             <div class="lock-overlay">
                 <div class="lock-card">
-                    <p style="font-weight:bold; font-size:1.1rem; color:#333; margin-bottom:15px;">
+                    <p style="font-weight:bold; font-size:1.1rem; color:#333; margin-bottom:0;">
                         🔓 封印されたレポートを今すぐ読む（無料）
                     </p>
                 </div>
@@ -743,7 +771,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 
 # ==========================================
-# 6. Main UI Application (Ver Final_Fixed_HTML)
+# 6. Main UI Application (Ver Final_UI_Fixed)
 # ==========================================
 
 st.title("Project MAP")
@@ -753,8 +781,7 @@ main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
-        # 修正2: FATE Code説明文の追加 (st.form直下)
-        st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
+        # 修正1: ここからFATE Code説明文を削除
         
         st.markdown("### 1. 生年月日")
         col_y, col_m, col_d = st.columns([1.2, 1, 1])
@@ -811,4 +838,3 @@ with catalog_tab:
             
             # 共通コンポーネント呼び出し
             render_result_component(c, dummy_fate_code, dummy_scores, big5_norm=None, is_catalog=True, key_suffix=f"cat_{i}")
-
