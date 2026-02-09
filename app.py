@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Fixed_v2)
+# 1. Page Config & CSS (Ver Final_Fixed_HTML)
 # ==========================================
 st.set_page_config(
     page_title="Project MAP",
@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS定義（f-stringを使わず、純粋な文字列として定義）
+# CSS定義
 st.markdown("""
 <style>
     /* 全体設定 */
@@ -148,59 +148,6 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* CTA・ブラーエリア */
-    .cta-section {
-        background-color: #FAFAFA;
-        border: 2px solid #E0E0E0;
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 30px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
-    .cta-header {
-        font-size: 1.2rem;
-        font-weight: 900;
-        color: #333;
-        margin-bottom: 20px;
-        background: #fff;
-        display: inline-block;
-        padding: 5px 15px;
-        border-radius: 20px;
-        border: 1px solid #ddd;
-    }
-    .cta-list {
-        text-align: left;
-        margin: 0 auto 20px auto;
-        display: inline-block;
-        font-weight: bold;
-        line-height: 1.8;
-    }
-    .blurred-content {
-        filter: blur(8px);
-        opacity: 0.7;
-        pointer-events: none;
-        user-select: none;
-        margin: 20px 0;
-    }
-    
-    /* 相性マトリクス */
-    .matrix-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.8rem;
-    }
-    .matrix-table th, .matrix-table td {
-        border: 1px solid #ccc;
-        padding: 5px;
-        text-align: center;
-    }
-    .matrix-header {
-        background-color: #eee;
-        font-weight: bold;
-    }
-    
     /* ロックオーバーレイ */
     .lock-overlay {
         position: absolute;
@@ -267,7 +214,7 @@ FATE_MEANINGS = {
 # 全タイプ共通CTAテキスト
 COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
 
-# 診断コンテンツ (Ver Final_Fixed_v2: default_scores追加)
+# 診断コンテンツ (Ver Final_Fixed_HTML)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
         "name": "鬼軍曹 (THE DRILL SERGEANT)",
@@ -619,7 +566,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_Fixed_v3)
+# 5. UI Component Function (Ver Final_Fixed_HTML)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -628,7 +575,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     theme_color = content.get('color', '#333')
     
     # --- 1. HERO SECTION (表の顔) ---
-    # タイトル位置修正: カードの直前に配置
+    # 修正3: タイトルの追加
     st.subheader("【表の顔】社会的役割としてのあなた")
     
     st.markdown(f'<div class="read-card" style="border-top: 10px solid {theme_color};">', unsafe_allow_html=True)
@@ -642,7 +589,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown(f"<div class='phrase-container'>{phrases_html}</div>", unsafe_allow_html=True)
     
     # Image Logic
-    # 図鑑モードや診断モードに関わらず、content内の名前からIDを特定して画像を表示
     type_id = 1
     for k, v in DIAGNOSIS_CONTENT.items():
         if v['name'] == content['name']:
@@ -679,7 +625,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown(f"<h3 style='border-color:{theme_color};'>③ ストレス時の『影』</h3>", unsafe_allow_html=True)
     st.write(content['shadow_phase'])
 
-    # Impression (絵文字削除・テキストのみ)
+    # Impression
     st.markdown(f"<h3 style='border-color:{theme_color};'>④ 周囲からの評判</h3>", unsafe_allow_html=True)
     col_g, col_b = st.columns(2)
     with col_g:
@@ -697,16 +643,10 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (裏の顔) ---
-    # タイトル位置修正: チャートエリアの直前に配置
     st.subheader("【裏の顔】潜在的な本質とズレ")
     
-    # フック文章 (診断時のみ)
-    if not is_catalog and big5_norm:
-        hook_text = analyze_big5_gap(big5_norm, type_id - 1)
-        if "注意" in hook_text: st.error(hook_text)
-        else: st.success(hook_text)
-    elif is_catalog:
-        st.info("※ ここには、あなたの現在の状態と宿命のギャップが表示されます（診断時のみ）")
+    # 修正4: 不要な緑ボックス(st.success/st.error)を完全に削除
+    # （ここにあった analyze_big5_gap の結果表示コードを削除）
 
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
@@ -724,7 +664,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     fig = go.Figure()
     
     # 宿命 (Orange)
-    # fate_scoresは辞書型で渡される想定 {'Identity': 5, ...}
     f_vals = [fate_scores['Identity'], fate_scores['Create'], fate_scores['Economy'], fate_scores['Status'], fate_scores['Vitality']]
     fig.add_trace(go.Scatterpolar(r=f_vals, theta=categories, fill='toself', name='宿命(表)', line_color='#E65100'))
     
@@ -752,8 +691,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # CTAボタン1
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
-        # チラ見せエリア (HTMLバグ修正: 変数定義 & 純粋な文字列として定義)
-        # CSSクラスは Part 1 で定義済みのため、ここではHTML構造のみ記述
+        # 修正1: HTML描画バグの修正 (変数に格納し、markdownでレンダリング)
         cta_html = """
         <div class="cta-section">
             <div class="cta-header">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
@@ -805,7 +743,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 
 # ==========================================
-# 6. Main UI Application (Ver Final_Fixed_v3)
+# 6. Main UI Application (Ver Final_Fixed_HTML)
 # ==========================================
 
 st.title("Project MAP")
@@ -815,12 +753,8 @@ main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
-        # タイトル位置修正: formの一番上に配置
-        st.info("""
-        **FATE Code（運命の設計図）とは？**
-        Input（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。
-        この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。
-        """)
+        # 修正2: FATE Code説明文の追加 (st.form直下)
+        st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
         
         st.markdown("### 1. 生年月日")
         col_y, col_m, col_d = st.columns([1.2, 1, 1])
@@ -871,13 +805,10 @@ with catalog_tab:
         c = DIAGNOSIS_CONTENT[i]
         
         with st.expander(f"Type {i+1}: {c['name']}"):
-            # 図鑑適正化: 各タイプ定義内の 'fate_code_type' と 'default_scores' を使用
-            # これによりオール3ではなく、そのタイプ固有のチャートが表示される
+            # 図鑑用データ
             dummy_fate_code = c.get('fate_code_type', 'XXXX')
-            
-            # デフォルトスコアの取得（未定義の場合は安全策としてオール3）
             dummy_scores = c.get('default_scores', {'Identity':3, 'Create':3, 'Economy':3, 'Status':3, 'Vitality':3})
             
-            # 共通コンポーネント呼び出し (key_suffixで重複回避)
+            # 共通コンポーネント呼び出し
             render_result_component(c, dummy_fate_code, dummy_scores, big5_norm=None, is_catalog=True, key_suffix=f"cat_{i}")
 
