@@ -666,7 +666,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         if "注意" in hook_text: st.error(hook_text)
         else: st.success(hook_text)
     elif is_catalog:
-        st.info("※ ここには、あなたの現在の状態と宿命のギャップが表示されます（診断時のみ）")
+        st.info("※ ここには、あなたの表の顔と裏の顔のギャップが表示されます（診断時のみ）")
 
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
