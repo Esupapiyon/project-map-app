@@ -616,7 +616,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('<div class="read-card">', unsafe_allow_html=True)
     
     # 修正2: 「表の性格」タイトルの追加
-    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の顔】宿命</h3>", unsafe_allow_html=True)
     
     st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
     st.markdown("---")
@@ -648,7 +648,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (裏の顔) ---
-    st.subheader("【裏の顔】潜在的な本質とズレ")
+    st.subheader("【裏の顔】現在の性格")
     
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
@@ -703,22 +703,22 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 <span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">💰 【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
+<span style="color: #D32F2F; font-size: 1.3rem;">💴 【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">💘 【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
+<span style="color: #D32F2F; font-size: 1.3rem;">❤️‍🔥 【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
 </div>
 </div>
 
 <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
 <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-📊 【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
+【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
 </div>
 </div>
 
 <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
 <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-🎁 【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
+【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
 </div>
 <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
 ※ 登録後すぐに自動で送られます。<br>インスタでシェアして本当の自分を表現しよう。
