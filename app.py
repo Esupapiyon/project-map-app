@@ -700,13 +700,13 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
+<span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">💴 【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
+<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">❤️‍🔥 【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
+<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
 </div>
 </div>
 
@@ -731,7 +731,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 <div style="position: absolute; top: 65%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
 <div style="background: rgba(255,255,255,0.9); display: inline-block; padding: 10px 20px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-<span style="font-weight:bold; font-size:1rem; color:#333;">🔓 封印されたレポートを今すぐ読む</span>
+<span style="font-weight:bold; font-size:1rem; color:#333;">🔓 現在の性格の詳細なレポートを今すぐ読む</span>
 </div>
 </div>
 </div>
@@ -739,7 +739,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         st.markdown(cta_html, unsafe_allow_html=True)
         
         # CTAボタン2
-        st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        st.link_button("🔓 あなたの裏側レポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
     else:
         st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
 
