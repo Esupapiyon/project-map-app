@@ -503,7 +503,7 @@ def analyze_big5_gap(scores_norm, fate_type_id):
     elif fate_type_id in [1, 9] and scores_norm["Agreeableness"] < 2.5: is_gap = True
     elif fate_type_id in [4, 7] and scores_norm["Conscientiousness"] < 2.5: is_gap = True
     
-    if is_gap: return "⚠️ 注意：あなたの本来の才能が、現在60%死んでいます。"
+    if is_gap: return " 注意：あなたの本来の才能が、現在60%死んでいます。"
     else: return "✨ 素晴らしい：宿命通りに才能が発揮されています。ただし…"
 
 class FortuneEngineIntegrated:
