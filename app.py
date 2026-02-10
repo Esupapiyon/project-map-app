@@ -6,16 +6,16 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_UD_EmojiLess)
+# 1. Page Config & CSS (Ver Final_Complete_V2)
 # ==========================================
 st.set_page_config(
-    page_title="裏・ステータス診断 | FATE STATUS", # タイトル変更
-    page_icon=None,  # 修正：絵文字削除
+    page_title="Project MAP",
+    page_icon=None,
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# CSS定義（変更なし）
+# CSS定義
 st.markdown("""
 <style>
     /* 全体設定 */
@@ -148,31 +148,12 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* ロックオーバーレイ */
-    .lock-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        text-align: center;
-        z-index: 10;
-    }
-    .lock-card {
-        background: rgba(255,255,255,0.95);
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: 1px solid #ddd;
-    }
-
-    /* 入力フォームのヒントテキストを非表示 */
+    /* 入力フォームのヒントテキストを非表示 (New!) */
     [data-testid="InputInstructions"] {
         display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # 2. Helper Functions
 # ==========================================
@@ -749,10 +730,12 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         
         # CTAボタン2
         st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        
     else:
         st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ==========================================
 # 6. Main UI Application (Ver Final_Optimized)
