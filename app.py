@@ -741,7 +741,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # CTAボタン2
         st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
     else:
-        st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
+        st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
 
 # ==========================================
 # 6. Main UI Application (Ver Final_CTA_Fixed)
