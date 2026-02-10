@@ -9,7 +9,7 @@ import pandas as pd
 # 1. Page Config & CSS (Ver Final_Copy_Fix)
 # ==========================================
 st.set_page_config(
-    page_title="Project MAP",
+    page_title="裏・ステータス診断 | FATE STATUS",
     page_icon=None,
     layout="centered",
     initial_sidebar_state="collapsed"
