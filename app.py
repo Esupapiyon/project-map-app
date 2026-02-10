@@ -8,7 +8,7 @@ import urllib.parse
 import textwrap
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Fix_CTA)
+# 1. Page Config & CSS (Ver Final_Fix_CTA_Bug)
 # ==========================================
 st.set_page_config(
     page_title="裏・ステータス診断 | FATE STATUS",
@@ -192,7 +192,6 @@ def load_image(type_id):
         path = os.path.join(base_dir, f"{target_id}{ext}")
         if os.path.exists(path): return path
     return None
-
 # ==========================================
 # 3. Logic Data (Part A: Content & Constants)
 # ==========================================
@@ -221,7 +220,7 @@ FATE_MEANINGS = {
 # 全タイプ共通CTAテキスト
 COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
 
-# 診断コンテンツ (Ver Final_Fix_CTA)
+# 診断コンテンツ (Ver Final_Fix_CTA_Bug)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
         "name": "鬼軍曹 (THE DRILL SERGEANT)",
@@ -582,7 +581,8 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     theme_color = content.get('color', '#333')
     
     # FATE Code説明文
-    st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
+    if not is_catalog:
+        st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
     
     # --- 1. HERO SECTION (表の顔) ---
     st.subheader("【表の顔】社会的役割としてのあなた")
@@ -695,7 +695,11 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
     # === CTA AREA (診断時のみ) ===
     if not is_catalog:
+        import urllib.parse
+        import textwrap
+        
         # 1. LINEリンクの動的生成ロジック
+        # Type IDの特定
         current_type_id = 1
         for k, v in DIAGNOSIS_CONTENT.items():
             if v['name'] == content['name']:
@@ -732,8 +736,8 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # 2. 上部ボタン表示
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", line_link, type="primary", use_container_width=True)
         
-        # 3. HTML表示（絵文字あり・赤枠デザイン + textwrap.dedentでインデント修正）
-        cta_html = textwrap.dedent(f"""\
+        # 3. HTML表示（textwrap.dedentでインデントを除去し、表示崩れを防ぐ）
+        cta_html = textwrap.dedent(f"""
             <div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                 <div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
 
