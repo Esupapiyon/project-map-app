@@ -687,10 +687,10 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 <span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
+<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
+<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
 </div>
 </div>
 
