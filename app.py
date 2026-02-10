@@ -4,9 +4,10 @@ import plotly.graph_objects as go
 import random
 import os
 import pandas as pd
+import urllib.parse  # 追加: LINEメッセージ用
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_UD_Title_Fixed)
+# 1. Page Config & CSS (Ver Final_LINE_UD)
 # ==========================================
 st.set_page_config(
     page_title="裏・ステータス診断 | FATE STATUS",
@@ -219,7 +220,7 @@ FATE_MEANINGS = {
 # 全タイプ共通CTAテキスト
 COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
 
-# 診断コンテンツ (Ver Final_CTA_Fixed)
+# 診断コンテンツ (Ver Final_LINE_UD)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
         "name": "鬼軍曹 (THE DRILL SERGEANT)",
@@ -336,6 +337,7 @@ DIAGNOSIS_CONTENT = {
         "golden_rule_long": "『とりあえずやってみる』精神を、意図的に持て。\nあなたの慎重さは武器ですが、時には足枷になります。考えすぎる前に、まず靴を履いて外に出る。その一歩の軽やかさを身につければ、あなたの圧倒的な実力は、さらに広い世界で輝きます。",
         "cta_text": COMMON_CTA
     },
+
     5: { # Type 6: 己 (Earth-)
         "name": "オカン (THE MOM)",
         "color": "#F9A825",
@@ -571,7 +573,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_Complete_V2)
+# 5. UI Component Function (Ver Final_LINE_UD)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -587,8 +589,8 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     
     st.markdown(f'<div class="read-card" style="border-top: 10px solid {theme_color};">', unsafe_allow_html=True)
     
-    # Name & Catch
-    st.markdown(f"<div class='type-name-huge' style='color:{theme_color};'>{content['name']}</div>", unsafe_allow_html=True)
+    # Name & Catch (視認性向上のため黒文字)
+    st.markdown(f"<div class='type-name-huge' style='color:#222;'>{content['name']}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='catch-subtitle'>{content['catch']}</div>", unsafe_allow_html=True)
     
     # Phrases (Bubbles)
@@ -693,71 +695,90 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
     # === CTA AREA (診断時のみ) ===
     if not is_catalog:
-        # CTAボタン1
-        st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
-        # 修正: HTML定義（オーバーレイを<a>タグでリンク化）
-        cta_html = """
-<div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-<div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
+        # --- LINE URL生成ロジック ---
+        line_message = f"【閲覧希望】裏・ステータス診断の結果（Type{type_id}: {content['name']}）のレポートをください"
+        
+        # Big5スコアがある場合は追記
+        if big5_norm:
+            line_message += "\n\n▼ 現在の裏ステータス\n"
+            line_message += f"・外向性: {big5_norm['Extraversion']}\n"
+            line_message += f"・協調性: {big5_norm['Agreeableness']}\n"
+            line_message += f"・勤勉性: {big5_norm['Conscientiousness']}\n"
+            line_message += f"・神経症傾向: {big5_norm['Neuroticism']}\n"
+            line_message += f"・開放性: {big5_norm['Openness']}"
+            
+        # URLエンコード
+        line_url = f"https://line.me/R/oaMessage/@736ihkeb/?{urllib.parse.quote(line_message)}"
+        
+        # CTAボタン1
+        st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", line_url, type="primary", use_container_width=True)
+        
+        # 修正: 絵文字なし・UDデザインのCTA (リンク適用済み)
+        cta_html = f"""
+<div style="margin-top: 30px; background-color: #FFFFFF; border: 4px solid #333; border-radius: 8px; padding: 30px 20px; text-align: center; position: relative; overflow: hidden; color: #333;">
 
-<div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
-<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
-</div>
-<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
-</div>
-<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
-</div>
-</div>
+    <div style="background: #333; color: #FFF; font-weight: bold; font-size: 1.1rem; padding: 10px 20px; border-radius: 4px; display: inline-block; margin-bottom: 25px; letter-spacing: 0.05em;">
+        LINE限定：心理学ロジックで解き明かす『あなたの真実』
+    </div>
 
-<div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-<div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
-</div>
-</div>
-
-<div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-<div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
-</div>
-<div style="font-size: 0.95rem; font-weight: bold; color: #555;">
-※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。
-</div>
-</div>
-
-<div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem; padding-bottom: 40px;">
-ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
-</div>
-
-<div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
-    <a href="https://line.me/R/ti/p/dummy_id" target="_blank" style="text-decoration: none;">
-        <div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
-            <span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                🔒 現在の性格の詳細なレポートを今すぐ読む（無料）
-            </span>
+    <div style="text-align: left; margin: 0 auto 30px auto; display: inline-block; width: 100%; max-width: 500px;">
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; line-height: 1.6; border-bottom: 1px solid #EEE; padding-bottom: 10px;">
+            <span style="color: #D32F2F; font-weight: 900;">【警告】</span> 99%が自滅する、あなたの『地雷スイッチ』の正体
         </div>
-    </a>
-</div>
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; line-height: 1.6; border-bottom: 1px solid #EEE; padding-bottom: 10px;">
+            <span style="color: #D32F2F; font-weight: 900;">【金運】</span> 努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
+        </div>
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; line-height: 1.6;">
+            <span style="color: #D32F2F; font-weight: 900;">【恋愛】</span> ※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
+        </div>
+    </div>
+
+    <div style="border: 2px solid #333; background-color: #FAFAFA; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+        <div style="color: #333; font-weight: 900; font-size: 1.1rem; line-height: 1.5;">
+            【相性】 全タイプ網羅『運命の相関マトリクス図』
+        </div>
+    </div>
+
+    <div style="border: 2px solid #D32F2F; background-color: #FFF; padding: 15px; margin-bottom: 30px; border-radius: 4px;">
+        <div style="color: #D32F2F; font-weight: 900; font-size: 1.1rem; line-height: 1.5; margin-bottom: 5px;">
+            【登録特典】 あなたの『表と裏』を一枚に『ステータス診断カード』
+        </div>
+        <div style="font-size: 0.85rem; font-weight: bold; color: #666;">
+            ※ 登録後すぐに自動で送られます。SNSでシェアして本当の自分を表現しよう。
+        </div>
+    </div>
+
+    <div style="filter: blur(4px); opacity: 0.5; user-select: none; font-size: 0.8rem; padding-bottom: 50px; text-align: left;">
+        ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
+    </div>
+
+    <div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
+        <a href="{line_url}" target="_blank" style="text-decoration: none;">
+            <div style="background: #D32F2F; color: #FFF; display: inline-block; padding: 15px 30px; border-radius: 4px; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 0.05em;">
+                封印されたレポートを今すぐ読む
+            </div>
+        </a>
+    </div>
+
 </div>
 """
         st.markdown(cta_html, unsafe_allow_html=True)
         
         # CTAボタン2
-        st.link_button("🔓 あなたの裏側のレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", line_url, type="primary", use_container_width=True)
         
     else:
-        st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
+        st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+
 # ==========================================
-# 6. Main UI Application (Ver Final_Optimized)
+# 6. Main UI Application (Ver Final_LINE_UD)
 # ==========================================
 
-# 修正後: タイトルとサブタイトル
+# タイトル表示 (UD仕様: シンプルかつ高コントラスト)
 st.markdown("<h1 style='text-align: center; color: #222; margin-bottom: 10px;'>裏・ステータス診断</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-bottom: 30px;'>FATE STATUS - あなたの「才能」と「地雷」を可視化する</p>", unsafe_allow_html=True)
 
@@ -768,7 +789,7 @@ with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
         st.markdown("### 1. 生年月日")
-        # 修正: スマホ最適化のため、プルダウン廃止・テキスト入力化
+        # テキスト入力 (バリデーション用)
         dob_input = st.text_input("生年月日", placeholder="例: 19970324（半角数字）", max_chars=8, help="西暦から続けて8桁で入力してください")
             
         st.markdown("---")
@@ -783,9 +804,9 @@ with main_tab:
             
         submitted = st.form_submit_button("診断結果を見る", type="primary", use_container_width=True)
     
-    # B. 結果表示 (バリデーション追加)
+    # B. 結果表示
     if submitted:
-        # バリデーション: 数字かつ8桁か
+        # バリデーション
         if not dob_input.isdigit() or len(dob_input) != 8:
             st.error("生年月日は「19970324」のように半角数字8桁で入力してください。")
         else:
@@ -829,3 +850,4 @@ with catalog_tab:
             
             # 共通コンポーネント呼び出し
             render_result_component(c, dummy_fate_code, dummy_scores, big5_norm=None, is_catalog=True, key_suffix=f"cat_{i}")
+    
