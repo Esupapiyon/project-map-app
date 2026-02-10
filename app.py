@@ -566,7 +566,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_CTA_Fixed)
+# 5. UI Component Function (Ver Final_Optimized)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -574,7 +574,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     """
     theme_color = content.get('color', '#333')
     
-    # 修正1: FATE Code説明文をここに移動
+    # FATE Code説明文
     st.info("【FATE Codeとは？】\nInput（情報の取り方） / Process（判断基準） / Output（行動特性） / Drive（原動力） の4要素であなたの行動原理を解明するコードです。この『クセ』を知ることで、なぜ同じ失敗を繰り返すのかが分かり、あなただけの『勝ちパターン』が見えてきます。")
     
     # --- 1. HERO SECTION (表の顔) ---
@@ -615,9 +615,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # --- 3. STORY SECTION ---
     st.markdown('<div class="read-card">', unsafe_allow_html=True)
     
-    # 修正2: 「表の性格」タイトルの追加
-    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の顔】宿命</h3>", unsafe_allow_html=True)
-    
+    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】</h3>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -648,7 +646,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (裏の顔) ---
-    st.subheader("【裏の顔】現在の性格")
+    st.subheader("【裏の顔】潜在的な本質とズレ")
     
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
@@ -688,12 +686,12 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     )
     st.plotly_chart(fig, use_container_width=True, config={'staticPlot': True}, key=f"radar_{key_suffix}")
 
-   # === CTA AREA (診断時のみ) ===
+    # === CTA AREA (診断時のみ) ===
     if not is_catalog:
         # CTAボタン1
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
-        # 修正: インデントなしのHTML定義（デザイン強化版）
+        # 修正: インデントなしのHTML定義（デザイン強化版・位置調整済み）
         cta_html = """
 <div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
 <div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
@@ -725,13 +723,13 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 </div>
 </div>
 
-<div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem;">
+<div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem; padding-bottom: 40px;">
 ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
 </div>
 
-<div style="position: absolute; top: 65%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
+<div style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
 <div style="background: rgba(255,255,255,0.9); display: inline-block; padding: 10px 20px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-<span style="font-weight:bold; font-size:1rem; color:#333;">🔓 現在の性格の詳細なレポートを今すぐ読む</span>
+<span style="font-weight:bold; font-size:1rem; color:#333;">🔓 封印されたレポートを今すぐ読む</span>
 </div>
 </div>
 </div>
@@ -739,12 +737,12 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         st.markdown(cta_html, unsafe_allow_html=True)
         
         # CTAボタン2
-        st.link_button("🔓 あなたの裏側レポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
     else:
-        st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
+        st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
 
 # ==========================================
-# 6. Main UI Application (Ver Final_CTA_Fixed)
+# 6. Main UI Application (Ver Final_Optimized)
 # ==========================================
 
 st.title("Project MAP")
@@ -754,13 +752,9 @@ main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
-        # FATE Code説明文は render_result_component に移動したため削除
-        
         st.markdown("### 1. 生年月日")
-        col_y, col_m, col_d = st.columns([1.2, 1, 1])
-        with col_y: year = st.selectbox("年", list(range(1900, 2031)), index=95)
-        with col_m: month = st.selectbox("月", list(range(1, 13)), index=0)
-        with col_d: day = st.selectbox("日", list(range(1, 32)), index=0)
+        # 修正: スマホ最適化のため、プルダウン廃止・テキスト入力化
+        dob_input = st.text_input("生年月日", placeholder="例: 19970324（半角数字）", max_chars=8, help="西暦から続けて8桁で入力してください")
             
         st.markdown("---")
         st.markdown("### 2. 性格診断 (任意)")
@@ -774,27 +768,36 @@ with main_tab:
             
         submitted = st.form_submit_button("診断結果を見る", type="primary", use_container_width=True)
     
-    # B. 結果表示
+    # B. 結果表示 (バリデーション追加)
     if submitted:
-        try:
-            date_obj = datetime.date(year, month, day)
-            date_str = date_obj.strftime("%Y/%m/%d")
-            
-            engine = FortuneEngineIntegrated()
-            result = engine.analyze_basic(date_str)
-            gan_id = result['gan']
-            content = DIAGNOSIS_CONTENT[gan_id]
-            fate_scores = result['scores']
-            fate_code = result['fate_code']
-            
-            # Big Five 計算
-            _, big5_norm = calculate_big5(tipi_answers)
-            
-            # 共通コンポーネント呼び出し
-            render_result_component(content, fate_code, fate_scores, big5_norm, is_catalog=False, key_suffix="main")
+        # バリデーション: 数字かつ8桁か
+        if not dob_input.isdigit() or len(dob_input) != 8:
+            st.error("生年月日は「19970324」のように半角数字8桁で入力してください。")
+        else:
+            try:
+                # 文字列を日付に変換して存在チェック
+                year = int(dob_input[:4])
+                month = int(dob_input[4:6])
+                day = int(dob_input[6:])
+                date_obj = datetime.date(year, month, day)
+                date_str = date_obj.strftime("%Y/%m/%d")
+                
+                # ここから既存ロジック
+                engine = FortuneEngineIntegrated()
+                result = engine.analyze_basic(date_str)
+                gan_id = result['gan']
+                content = DIAGNOSIS_CONTENT[gan_id]
+                fate_scores = result['scores']
+                fate_code = result['fate_code']
+                
+                # Big Five 計算
+                _, big5_norm = calculate_big5(tipi_answers)
+                
+                # 共通コンポーネント呼び出し
+                render_result_component(content, fate_code, fate_scores, big5_norm, is_catalog=False, key_suffix="main")
 
-        except ValueError:
-            st.error("正しい日付を選択してください。")
+            except ValueError:
+                st.error("存在しない日付です。正しく入力してください。（例：2月30日などはエラーになります）")
 
 # --- Tab 2: 全タイプ図鑑 ---
 with catalog_tab:
