@@ -739,25 +739,25 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
     <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
         <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
+            <span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
         </div>
         <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">💰 【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
+            <span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
         </div>
         <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">💘 【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
+            <span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
         </div>
     </div>
 
     <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
         <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-            📊 【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
+            【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
         </div>
     </div>
 
     <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
         <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-            🎁 【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
+            【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
         </div>
         <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
             ※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。
