@@ -601,7 +601,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # --- 3. STORY SECTION ---
     st.markdown('<div class="read-card">', unsafe_allow_html=True)
     
-    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】宿命</h3>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -632,7 +632,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (裏の顔) ---
-    st.subheader("【裏の顔】潜在的な本質とズレ")
+    st.subheader("【裏の顔】現在の性格（潜在的な本質とズレ）")
     
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
@@ -684,28 +684,28 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
+<span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">💰 【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
+<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">💘 【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
+<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
 </div>
 </div>
 
 <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
 <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-📊 【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
+【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
 </div>
 </div>
 
 <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
 <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-🎁 【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
+【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
 </div>
 <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
-※ 登録後すぐに自動で送られます。<br>インスタでシェアして本当の自分を表現しよう。
+※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。
 </div>
 </div>
 
@@ -717,7 +717,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     <a href="https://line.me/R/ti/p/dummy_id" target="_blank" style="text-decoration: none;">
         <div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
             <span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                🔒 封印されたレポートを今すぐ読む
+                🔒 現在の性格の詳細なレポートを今すぐ読む（無料）
             </span>
         </div>
     </a>
@@ -727,10 +727,10 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         st.markdown(cta_html, unsafe_allow_html=True)
         
         # CTAボタン2
-        st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        st.link_button("🔓 あなたの裏側のレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
     else:
-        st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
+        st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
