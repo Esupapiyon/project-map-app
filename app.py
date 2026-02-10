@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_CTA_Fixed)
+# 1. Page Config & CSS (Ver Final_Complete_V2)
 # ==========================================
 st.set_page_config(
     page_title="Project MAP",
@@ -148,26 +148,12 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* ロックオーバーレイ（CSSバックアップ） */
-    .lock-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        text-align: center;
-        z-index: 10;
-    }
-    .lock-card {
-        background: rgba(255,255,255,0.95);
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border: 1px solid #ddd;
+    /* 入力フォームのヒントテキストを非表示 (New!) */
+    [data-testid="InputInstructions"] {
+        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
-
 # ==========================================
 # 2. Helper Functions
 # ==========================================
@@ -566,7 +552,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_Optimized)
+# 5. UI Component Function (Ver Final_Complete_V2)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -691,32 +677,32 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # CTAボタン1
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
         
-        # 修正: インデントなしのHTML定義（デザイン強化版・位置調整済み）
+        # 修正: HTML定義（オーバーレイを<a>タグでリンク化）
         cta_html = """
 <div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
 <div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
 
 <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
+<span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
+<span style="color: #D32F2F; font-size: 1.3rem;">💰 【仕事】</span>『裏の武器』を使って年収を倍にする具体的戦略
 </div>
 <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-<span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
+<span style="color: #D32F2F; font-size: 1.3rem;">💘 【恋愛】</span>あなたの『本性』を全肯定してくれる運命の相手
 </div>
 </div>
 
 <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
 <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
+📊 【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
 </div>
 </div>
 
 <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
 <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
+🎁 【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
 </div>
 <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
 ※ 登録後すぐに自動で送られます。<br>インスタでシェアして本当の自分を表現しよう。
@@ -727,10 +713,14 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
 </div>
 
-<div style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
-<div style="background: rgba(255,255,255,0.9); display: inline-block; padding: 10px 20px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-<span style="font-weight:bold; font-size:1rem; color:#333;">🔓 封印されたレポートを今すぐ読む</span>
-</div>
+<div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
+    <a href="https://line.me/R/ti/p/dummy_id" target="_blank" style="text-decoration: none;">
+        <div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+            <span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                🔒 封印されたレポートを今すぐ読む
+            </span>
+        </div>
+    </a>
 </div>
 </div>
 """
@@ -738,8 +728,11 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         
         # CTAボタン2
         st.link_button("🔓 封印されたレポートを今すぐ読む（無料）", "https://line.me/R/ti/p/dummy_id", type="primary", use_container_width=True)
+        
     else:
         st.caption("※ 実際の診断では、ここに詳細な「裏性格レポート」と「相性マトリクス」が表示されます。")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ==========================================
 # 6. Main UI Application (Ver Final_Optimized)
