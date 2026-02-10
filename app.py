@@ -5,10 +5,10 @@ import random
 import os
 import pandas as pd
 import urllib.parse
-import textwrap  # 追加: HTMLのインデント対策
+import textwrap
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Fix_Indent)
+# 1. Page Config & CSS (Ver Final_Fix_CTA)
 # ==========================================
 st.set_page_config(
     page_title="裏・ステータス診断 | FATE STATUS",
@@ -218,10 +218,10 @@ FATE_MEANINGS = {
     "Y": "You (協調): 他者との調和や貢献を原動力にする。"
 }
 
-# 全タイプ共通CTAテキスト（※新しいロジックでは動的生成されるため、ここはプレースホルダーとして保持）
+# 全タイプ共通CTAテキスト
 COMMON_CTA = "ここから先は、膨大な行動データから導き出されたあなたの運命の『裏側』を無料で解析します。"
 
-# 診断コンテンツ (Ver Final_LINE_Emoji)
+# 診断コンテンツ (Ver Final_Fix_CTA)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
         "name": "鬼軍曹 (THE DRILL SERGEANT)",
