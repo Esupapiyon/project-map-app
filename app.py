@@ -5,9 +5,10 @@ import random
 import os
 import pandas as pd
 import urllib.parse
+import textwrap  # 追加: HTMLのインデント対策
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_LINE_Emoji)
+# 1. Page Config & CSS (Ver Final_Fix_Indent)
 # ==========================================
 st.set_page_config(
     page_title="裏・ステータス診断 | FATE STATUS",
@@ -572,7 +573,7 @@ class FortuneEngineIntegrated:
         return {"gan": gan, "scores": normalized_scores, "fate_code": fate_code, "partners": COMPATIBILITY_MAP.get(gan, [])}
 
 # ==========================================
-# 5. UI Component Function (Ver Final_LINE_Emoji)
+# 5. UI Component Function (Ver Final_LINE_Emoji_Fix)
 # ==========================================
 def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix=""):
     """
@@ -588,7 +589,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     
     st.markdown(f'<div class="read-card" style="border-top: 10px solid {theme_color};">', unsafe_allow_html=True)
     
-    # Name & Catch (視認性向上のため黒文字 #222 を維持)
+    # Name & Catch (視認性向上のため黒文字 #222)
     st.markdown(f"<div class='type-name-huge' style='color:#222;'>{content['name']}</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='catch-subtitle'>{content['catch']}</div>", unsafe_allow_html=True)
     
@@ -695,7 +696,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # === CTA AREA (診断時のみ) ===
     if not is_catalog:
         # 1. LINEリンクの動的生成ロジック
-        # Type IDの特定
         current_type_id = 1
         for k, v in DIAGNOSIS_CONTENT.items():
             if v['name'] == content['name']:
@@ -732,53 +732,54 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # 2. 上部ボタン表示
         st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", line_link, type="primary", use_container_width=True)
         
-        # 3. HTML表示（絵文字あり・赤枠デザイン + 動的リンク埋め込み）
-        cta_html = f"""
-<div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-    <div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
+        # 3. HTML表示（絵文字あり・赤枠デザイン + textwrap.dedentでインデント修正）
+        cta_html = textwrap.dedent(f"""\
+            <div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>
 
-    <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定
-        </div>
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
-        </div>
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
-            <span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
-        </div>
-    </div>
+                <div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">
+                    <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
+                        <span style="color: #D32F2F; font-size: 1.3rem;">⚠️ 【警告】</span>あなたの才能が『自滅』するパターンの特定
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
+                        <span style="color: #D32F2F; font-size: 1.3rem;">💰 【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;">
+                        <span style="color: #D32F2F; font-size: 1.3rem;">💘 【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』
+                    </div>
+                </div>
 
-    <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-        <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
-            【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
-        </div>
-    </div>
+                <div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">
+                        📊 【相性】全タイプ網羅！<br>『運命の相関マトリクス図』
+                    </div>
+                </div>
 
-    <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-        <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
-            【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
-        </div>
-        <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
-            ※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。
-        </div>
-    </div>
+                <div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">
+                        🎁 【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』
+                    </div>
+                    <div style="font-size: 0.95rem; font-weight: bold; color: #555;">
+                        ※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。
+                    </div>
+                </div>
 
-    <div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem; padding-bottom: 40px;">
-        ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
-    </div>
+                <div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem; padding-bottom: 40px;">
+                    ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...
+                </div>
 
-    <div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
-        <a href="{line_link}" target="_blank" style="text-decoration: none;">
-            <div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
-                <span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    🔒 現在の性格の詳細なレポートを今すぐ読む（無料）
-                </span>
+                <div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">
+                    <a href="{line_link}" target="_blank" style="text-decoration: none;">
+                        <div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                            <span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                                🔒 現在の性格の詳細なレポートを今すぐ読む（無料）
+                            </span>
+                        </div>
+                    </a>
+                </div>
             </div>
-        </a>
-    </div>
-</div>
-"""
+        """)
+        
         st.markdown(cta_html, unsafe_allow_html=True)
         
         # 4. 下部ボタン表示
@@ -794,7 +795,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 # 6. Main UI Application (Ver Final_Optimized)
 # ==========================================
 
-# タイトル表示 (UD仕様: シンプルかつ高コントラスト)
+# タイトル表示
 st.markdown("<h1 style='text-align: center; color: #222; margin-bottom: 10px;'>裏・ステータス診断</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-bottom: 30px;'>FATE STATUS - あなたの「才能」と「地雷」を可視化する</p>", unsafe_allow_html=True)
 
