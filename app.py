@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Copy_Fix)
+# 1. Page Config & CSS (Ver Final_UD_Title_Fixed)
 # ==========================================
 st.set_page_config(
     page_title="裏・ステータス診断 | FATE STATUS",
@@ -148,6 +148,24 @@ st.markdown("""
         line-height: 1.6;
     }
     
+    /* ロックオーバーレイ */
+    .lock-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        text-align: center;
+        z-index: 10;
+    }
+    .lock-card {
+        background: rgba(255,255,255,0.95);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+    }
+
     /* 入力フォームのヒントテキストを非表示 */
     [data-testid="InputInstructions"] {
         display: none !important;
@@ -739,7 +757,10 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 # 6. Main UI Application (Ver Final_Optimized)
 # ==========================================
 
-st.title("Project MAP")
+# 修正後: タイトルとサブタイトル
+st.markdown("<h1 style='text-align: center; color: #222; margin-bottom: 10px;'>裏・ステータス診断</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-bottom: 30px;'>FATE STATUS - あなたの「才能」と「地雷」を可視化する</p>", unsafe_allow_html=True)
+
 main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 
 # --- Tab 1: 診断 & 結果 ---
