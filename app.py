@@ -601,7 +601,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     # --- 3. STORY SECTION ---
     st.markdown('<div class="read-card">', unsafe_allow_html=True)
     
-    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 style='border-color:{theme_color};'>【表の性格】宿命</h3>", unsafe_allow_html=True)
     st.markdown(f"<div style='font-size:1.1rem; font-weight:bold; margin-bottom:20px; line-height:2.0;'>{content['intro']}</div>", unsafe_allow_html=True)
     st.markdown("---")
 
@@ -632,7 +632,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     st.markdown('</div>', unsafe_allow_html=True)
 
     # --- 4. ANALYSIS SECTION (裏の顔) ---
-    st.subheader("【裏の顔】潜在的な本質とズレ")
+    st.subheader("【裏の顔】現在の性格（潜在的な本質とズレ）")
     
     # チャートエリア
     st.markdown('<div class="read-card" style="position:relative; overflow:hidden;">', unsafe_allow_html=True)
