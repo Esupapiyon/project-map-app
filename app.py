@@ -6,11 +6,11 @@ import os
 import pandas as pd
 
 # ==========================================
-# 1. Page Config & CSS (Ver Final_Complete_V2)
+# 1. Page Config & CSS (Ver Final_Copy_Fix)
 # ==========================================
 st.set_page_config(
-    page_title="裏・ステータス診断 | FATE STATUS",
-    page_icon=None, # 修正：絵文字削除
+    page_title="Project MAP",
+    page_icon=None,
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -148,12 +148,13 @@ st.markdown("""
         line-height: 1.6;
     }
     
-    /* 入力フォームのヒントテキストを非表示 (New!) */
+    /* 入力フォームのヒントテキストを非表示 */
     [data-testid="InputInstructions"] {
         display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
+
 # ==========================================
 # 2. Helper Functions
 # ==========================================
