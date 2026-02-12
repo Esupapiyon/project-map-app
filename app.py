@@ -768,7 +768,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
 
 # ==========================================
-# 6. Main UI Application (Ver Final_Optimized)
+# 6. Main UI Application (Ver Final_UI_Tweak)
 # ==========================================
 
 # タイトル表示
@@ -782,8 +782,8 @@ with main_tab:
     # A. 入力フォーム
     with st.form("diagnosis_form"):
         st.markdown("### 1. プロフィール")
-        # 名前入力 (新規追加)
-        user_name_input = st.text_input("お名前（ニックネーム可）", placeholder="名無し", max_chars=10)
+        # 名前入力 (修正: デフォルト値を空にし、プレースホルダーで誘導)
+        user_name_input = st.text_input("お名前（ニックネーム可）", value="", placeholder="ここにお名前を入力してください", max_chars=10)
         
         # 生年月日入力
         dob_input = st.text_input("生年月日", placeholder="例: 19970324（半角数字）", max_chars=8, help="西暦から続けて8桁で入力してください")
@@ -826,6 +826,7 @@ with main_tab:
                 _, big5_norm = calculate_big5(tipi_answers)
                 
                 # 共通コンポーネント呼び出し（名前を渡す）
+                # render_result_component内で、名前が空なら自動的に「名無し」になります
                 render_result_component(
                     content, 
                     fate_code, 
