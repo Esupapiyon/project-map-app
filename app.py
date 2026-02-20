@@ -575,7 +575,7 @@ class FortuneEngineIntegrated:
 # ==========================================
 # 5. UI Component Function (Ver Final_GAS_Link)
 # ==========================================
-def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix="", user_name="名無し"):
+def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_catalog=False, key_suffix="", user_name="名無し", dob_str=""):
     """
     診断結果と図鑑で共通して使用する表示コンポーネント
     """
@@ -716,6 +716,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             "このまま送信してください👇",
             "----------------",
             f"NAME: {safe_name}",
+            f"BIRTH: {dob_str}",  
             f"TYPE: {current_type_id}"
         ]
 
@@ -835,6 +836,7 @@ with main_tab:
                     is_catalog=False, 
                     key_suffix="main",
                     user_name=user_name_input
+                    dob_str=dob_input
                 )
 
             except ValueError:
@@ -862,4 +864,5 @@ with catalog_tab:
                 is_catalog=True, 
                 key_suffix=f"cat_{i}",
                 user_name="ゲスト"
+                dob_str=""
             )
