@@ -835,7 +835,7 @@ with main_tab:
                     big5_norm, 
                     is_catalog=False, 
                     key_suffix="main",
-                    user_name=user_name_input
+                    user_name=user_name_input,
                     dob_str=dob_input
                 )
 
@@ -863,6 +863,6 @@ with catalog_tab:
                 big5_norm=None, 
                 is_catalog=True, 
                 key_suffix=f"cat_{i}",
-                user_name="ゲスト"
+                user_name="ゲスト",
                 dob_str=""
             )
