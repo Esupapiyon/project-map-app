@@ -6,7 +6,29 @@ import os
 import pandas as pd
 import urllib.parse
 import textwrap
+import gspread # ←★追加が必要な場合があります
+from oauth2client.service_account import ServiceAccountCredentials # ←★追加が必要な場合があります
 
+# ==========================================
+# インサイト収集：無料ファネル用トラッキング関数
+# ==========================================
+def track_free_insight(feature, action, detail=""):
+    try:
+        creds_dict = st.secrets["gcp_service_account"]
+        scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        client = gspread.authorize(creds)
+        
+        # GASと同じ「無料Logs」シートへ直接書き込む
+        sheet = client.open_by_url(st.secrets["spreadsheet_url"]).worksheet("無料Logs")
+        
+        jst = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
+        now_str = datetime.datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
+        
+        # 無料版はユーザーIDが確定していないため「Guest」として記録
+        sheet.append_row(["Guest", now_str, feature, action, detail])
+    except Exception as e:
+        print(f"Free Tracking Error: {e}")
 # ==========================================
 # 1. Page Config & CSS (Ver Final_GAS_Link)
 # ==========================================
@@ -776,6 +798,11 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 st.markdown("<h1 style='text-align: center; color: #222; margin-bottom: 10px;'>裏・ステータス診断</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-bottom: 30px;'>FATE STATUS - あなたの「才能」と「地雷」を可視化する</p>", unsafe_allow_html=True)
 
+# ▼▼▼ アプリ起動ログ（関所①） ▼▼▼
+if "free_app_opened" not in st.session_state:
+    track_free_insight("無料アプリ", "起動", "アクセス")
+    st.session_state.free_app_opened = True
+
 main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
 
 # --- Tab 1: 診断 & 結果 ---
@@ -814,10 +841,14 @@ with main_tab:
                 day = int(dob_input[6:])
                 date_obj = datetime.date(year, month, day)
                 date_str = date_obj.strftime("%Y/%m/%d")
-                
+                    
                 # ここから既存ロジック
                 engine = FortuneEngineIntegrated()
                 result = engine.analyze_basic(date_str)
+                    
+                # ▼▼▼ 診断完了ログ（歩留まり計測用） ▼▼▼
+                track_free_insight("無料アプリ", "診断完了", "BIG5結果生成")
+                    
                 gan_id = result['gan']
                 content = DIAGNOSIS_CONTENT[gan_id]
                 fate_scores = result['scores']
