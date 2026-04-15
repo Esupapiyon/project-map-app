@@ -28,6 +28,7 @@ def track_free_insight(feature, action, detail=""):
         # 無料版はユーザーIDが確定していないため「Guest」として記録
         sheet.append_row(["Guest", now_str, feature, action, detail])
     except Exception as e:
+        st.error(f"【原因特定用】無料トラッキングエラー: {e}")
         print(f"Free Tracking Error: {e}")
 # ==========================================
 # 1. Page Config & CSS (Ver Final_GAS_Link)
