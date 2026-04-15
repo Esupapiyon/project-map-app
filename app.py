@@ -801,7 +801,15 @@ st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-
 
 # ▼▼▼ アプリ起動ログ（関所①） ▼▼▼
 if "free_app_opened" not in st.session_state:
-    track_free_insight("無料アプリ", "起動", "アクセス")
+    # URLパラメータからsourceを取得（なければ "直接/不明"）
+    params = st.query_params
+    source = params.get("source", "直接/不明")
+    
+    # セッションに保存（後で診断完了ログでも使うため）
+    st.session_state.traffic_source = source
+    
+    # 「無料Logs」シートの詳細列に流入元を記録
+    track_free_insight("無料アプリ", "起動", f"流入元: {source}")
     st.session_state.free_app_opened = True
 
 main_tab, catalog_tab = st.tabs(["運命を診断する", "全タイプ図鑑"])
@@ -843,12 +851,8 @@ with main_tab:
                 date_obj = datetime.date(year, month, day)
                 date_str = date_obj.strftime("%Y/%m/%d")
                     
-                # ここから既存ロジック
-                engine = FortuneEngineIntegrated()
-                result = engine.analyze_basic(date_str)
-                    
-                # ▼▼▼ 診断完了ログ（歩留まり計測用） ▼▼▼
-                track_free_insight("無料アプリ", "診断完了", "BIG5結果生成")
+                source = st.session_state.get("traffic_source", "不明")
+                track_free_insight("無料アプリ", "診断完了", f"結果生成 (流入元: {source})")
                     
                 gan_id = result['gan']
                 content = DIAGNOSIS_CONTENT[gan_id]
