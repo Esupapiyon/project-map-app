@@ -202,20 +202,20 @@ st.markdown("""
 # 2. Helper Functions
 # ==========================================
 def load_image(type_id):
-    """画像パス探索"""
-    target_id = type_id
-    if type_id == 8: target_id = 9
-    elif type_id == 9: target_id = 8
-        
-    extensions = ['.png', '.jpg', '.jpeg', '.PNG', '.JPG']
-    base_dir = "images"
-    
-    if not os.path.exists(base_dir): return None
-    for ext in extensions:
-        path = os.path.join(base_dir, f"{target_id}{ext}")
-        if os.path.exists(path): return path
-    return None
-
+    """Googleドライブの直リンクURLを返す"""
+    chara_url_map = {
+        1: "https://drive.google.com/uc?export=view&id=1SRSfNNEPRz06c2w_9kKnMNVZutzY157L",
+        2: "https://drive.google.com/uc?export=view&id=19XgD_PoqJtCqL0-BYZmRJEvWXgMAG-8N",
+        3: "https://drive.google.com/uc?export=view&id=1Js93Yr8GbvfV9cjjNZBGfi3mBoMkGakH",
+        4: "https://drive.google.com/uc?export=view&id=13hFNjeCqjZGQs8wpq_bmJkorpSFtYMKF",
+        5: "https://drive.google.com/uc?export=view&id=1KWps-Cfb7mJ-R4ilfj0xkb0yuKOIGWWL",
+        6: "https://drive.google.com/uc?export=view&id=1YRF_aLSQdISa2MEiNvLuoZCD7KQDOA7v",
+        7: "https://drive.google.com/uc?export=view&id=1By8-jGe2Z1HSEr5uDYUWsxFT1t-zZU9u",
+        8: "https://drive.google.com/uc?export=view&id=1NkbSFukXvk1rlFzTKj26H7Cu6hNb3O6_",
+        9: "https://drive.google.com/uc?export=view&id=1zGERtGBm9F11qvDIiutHcjr9HUsldIy9",
+        10: "https://drive.google.com/uc?export=view&id=16BmzCWDN8sIFVjG-fLEPS3ykMcjkBGlE"
+    }
+    return chara_url_map.get(type_id, None)
 # ==========================================
 # 3. Logic Data (Part A: Content & Constants)
 # ==========================================
@@ -850,6 +850,9 @@ with main_tab:
                 day = int(dob_input[6:])
                 date_obj = datetime.date(year, month, day)
                 date_str = date_obj.strftime("%Y/%m/%d")
+                
+                engine = FortuneEngineIntegrated()
+                result = engine.analyze_basic(date_str)
                     
                 source = st.session_state.get("traffic_source", "不明")
                 track_free_insight("無料アプリ", "診断完了", f"結果生成 (流入元: {source})")
