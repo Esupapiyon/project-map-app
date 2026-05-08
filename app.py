@@ -800,8 +800,34 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 # ==========================================
 
 # タイトル表示
-st.markdown("<h1 style='text-align: center; color: #222; margin-bottom: 10px;'>裏・ステータス診断</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #555; font-size: 1rem; margin-bottom: 30px;'>FATE STATUS - あなたの「才能」と「地雷」を可視化する</p>", unsafe_allow_html=True)
+st.markdown("""
+<style>
+    .main-title {
+        text-align: center;
+        color: #222;
+        font-weight: 900;
+        font-size: 2.8rem; /* PC用の大きなサイズ */
+        margin-bottom: 10px;
+    }
+    .sub-title {
+        text-align: center;
+        color: #555;
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+    /* スマホ画面（幅600px以下）の時の設定 */
+    @media (max-width: 600px) {
+        .main-title {
+            font-size: 1.8rem; /* スマホで1行に収まるサイズに自動縮小 */
+        }
+        .sub-title {
+            font-size: 0.85rem; /* スマホ用にサブタイトルも少しだけ縮小してバランスを取ります */
+        }
+    }
+</style>
+<div class="main-title">裏・ステータス診断</div>
+<div class="sub-title">FATE STATUS - あなたの「才能」と「地雷」を可視化する</div>
+""", unsafe_allow_html=True)
 
 # ▼▼▼ アプリ起動ログ（関所①） ▼▼▼
 if "free_app_opened" not in st.session_state:
