@@ -10,6 +10,9 @@ import gspread # ←★追加が必要な場合があります
 from oauth2client.service_account import ServiceAccountCredentials # ←★追加が必要な場合があります
 
 if st.query_params.get("page") == "premium":
+    # センサー：合鍵を検知したら、画面の上に黄色い警告を出す
+    st.warning("🔑 合鍵を検知しました！現在、有料ページを読み込んでいます...")
+    
     with open("premium.py", encoding="utf-8") as f:
         exec(f.read(), globals())
     st.stop()
