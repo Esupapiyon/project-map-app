@@ -9,6 +9,10 @@ import textwrap
 import gspread # ←★追加が必要な場合があります
 from oauth2client.service_account import ServiceAccountCredentials # ←★追加が必要な場合があります
 
+if st.query_params.get("page") == "premium":
+    with open("premium.py", encoding="utf-8") as f:
+        exec(f.read(), globals())
+    st.stop()
 # ==========================================
 # インサイト収集：無料ファネル用トラッキング関数
 # ==========================================
