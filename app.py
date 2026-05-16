@@ -755,6 +755,8 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             line_text_lines.append(f"CO: {big5_norm.get('Conscientiousness', 3.0)}")
             # Neuroticismは反転せず生の値を送る（GAS側で処理統一するため）
             line_text_lines.append(f"NE: {big5_norm.get('Neuroticism', 3.0)}")
+
+            line_text_lines.append(f"SRC: {st.session_state.traffic_source}")
         
         line_text_lines.append("----------------")
         
@@ -833,7 +835,7 @@ st.markdown("""
 if "free_app_opened" not in st.session_state:
     # URLパラメータからsourceを取得（なければ "直接/不明"）
     params = st.query_params
-    source = params.get("source", "直接/不明")
+    source = params.get("src", "直接/不明")
     
     # セッションに保存（後で診断完了ログでも使うため）
     st.session_state.traffic_source = source
