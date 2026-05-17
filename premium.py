@@ -6704,11 +6704,12 @@ elif st.session_state.step == "test":
     st.markdown(f"<div class='question-title'>{question_data['text']}</div>", unsafe_allow_html=True)
     st.write("---")
     
-    st.button("全く違う", on_click=handle_answer, args=(current_q_num, 1), key=f"btn_1_{current_q_num}", type="secondary")
-    st.button("やや違う", on_click=handle_answer, args=(current_q_num, 2), key=f"btn_2_{current_q_num}", type="secondary")
-    st.button("どちらでもない", on_click=handle_answer, args=(current_q_num, 3), key=f"btn_3_{current_q_num}", type="secondary")
-    st.button("ややそう思う", on_click=handle_answer, args=(current_q_num, 4), key=f"btn_4_{current_q_num}", type="secondary")
-    st.button("強くそう思う", on_click=handle_answer, args=(current_q_num, 5), key=f"btn_5_{current_q_num}", type="secondary")
+    # ▼ 各ボタンの末尾に use_container_width=True を追加して横いっぱいに広げる
+    st.button("全く違う", on_click=handle_answer, args=(current_q_num, 1), key=f"btn_1_{current_q_num}", type="secondary", use_container_width=True)
+    st.button("やや違う", on_click=handle_answer, args=(current_q_num, 2), key=f"btn_2_{current_q_num}", type="secondary", use_container_width=True)
+    st.button("どちらでもない", on_click=handle_answer, args=(current_q_num, 3), key=f"btn_3_{current_q_num}", type="secondary", use_container_width=True)
+    st.button("ややそう思う", on_click=handle_answer, args=(current_q_num, 4), key=f"btn_4_{current_q_num}", type="secondary", use_container_width=True)
+    st.button("強くそう思う", on_click=handle_answer, args=(current_q_num, 5), key=f"btn_5_{current_q_num}", type="secondary", use_container_width=True)
 
 elif st.session_state.step == "processing":
     # ▼ 修正：ハッキング風の段階的なローディング演出（労働の錯覚）
