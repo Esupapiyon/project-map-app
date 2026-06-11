@@ -256,7 +256,7 @@ COMMON_CTA = "ここから先は、膨大な行動データから導き出され
 # 診断コンテンツ (Ver Final_GAS_Link)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
-        "name": "鬼軍曹 (THE DRILL SERGEANT)",
+        "name": "委員長 (THE DRILL SERGEANT)",
         "color": "#2E7D32", 
         "catch": "1ミリのズレで発狂する整理整頓の鬼",
         "phrases": ["結論から言って", "ルールなんで", "はぁ…（深いため息）"],
@@ -302,7 +302,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     2: { # Type 3: 丙 (Fire+)
-        "name": "センター (THE STAR)",
+        "name": "アイドル (THE STAR)",
         "color": "#C62828",
         "catch": "他人の話を聞く機能が「未実装」",
         "phrases": ["ねえ見て見て！", "すごくない！？（私が）", "飽きた"],
@@ -325,7 +325,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     3: { # Type 4: 丁 (Fire-)
-        "name": "教祖 (THE GURU)",
+        "name": "考察班 (THE GURU)",
         "color": "#C62828",
         "catch": "勝手に期待して勝手に裏切られた気になる",
         "phrases": ["別に…", "誰もわかってくれない", "……（既読スルー）"],
@@ -348,7 +348,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     4: { # Type 5: 戊 (Earth+)
-        "name": "長老 (THE ELDER)",
+        "name": "様子見 (THE ELDER)",
         "color": "#F9A825",
         "catch": "新しいやり方をとりあえず一度否定する",
         "phrases": ["一旦様子見で", "それ、今やる必要ある？", "めんどくさい"],
@@ -371,7 +371,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     5: { # Type 6: 己 (Earth-)
-        "name": "オカン (THE MOM)",
+        "name": "保護者 (THE MOM)",
         "color": "#F9A825",
         "catch": "良かれと思ってダメ人間を製造してしまう",
         "phrases": ["あんたのためを思って！", "大丈夫、あんたならできる！", "ほら言ったでしょ"],
@@ -394,7 +394,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     6: { # Type 7: 庚 (Metal+)
-        "name": "特攻隊長 (THE CAPTAIN)",
+        "name": "正論マン (THE CAPTAIN)",
         "color": "#546E7A",
         "catch": "「悪気はない」と言えば刺してもいいと思っている",
         "phrases": ["それって意味ある？", "効率悪いね", "要するにさ"],
@@ -500,16 +500,16 @@ ENERGY_STRENGTH = [
     [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3], [3, 2, 1, 1, 2, 1, 1, 1, 3, 3, 2, 3]
 ]
 COMPATIBILITY_MAP = {
-    0: ["No.6 オカン", "No.7 特攻隊長", "No.4 教祖"], 
-    1: ["No.7 特攻隊長", "No.8 貴族", "No.3 センター"],
-    2: ["No.8 貴族", "No.9 宇宙人", "No.5 長老"], 
-    3: ["No.9 宇宙人", "No.10 全肯定bot", "No.6 オカン"],
-    4: ["No.10 全肯定bot", "No.1 鬼軍曹", "No.7 特攻隊長"], 
-    5: ["No.1 鬼軍曹", "No.2 裏回し", "No.8 貴族"],
-    6: ["No.2 裏回し", "No.3 センター", "No.9 宇宙人"], 
-    7: ["No.3 センター", "No.4 教祖", "No.10 全肯定bot"],
-    8: ["No.4 教祖", "No.5 長老", "No.1 鬼軍曹"], 
-    9: ["No.5 長老", "No.6 オカン", "No.2 裏回し"]
+    0: ["No.6 保護者", "No.7 正論マン", "No.4 考察班"], 
+    1: ["No.7 正論マン", "No.8 貴族", "No.3 アイドル"],
+    2: ["No.8 貴族", "No.9 宇宙人", "No.5 様子見"], 
+    3: ["No.9 宇宙人", "No.10 全肯定bot", "No.6 保護者"],
+    4: ["No.10 全肯定bot", "No.1 委員長", "No.7 正論マン"], 
+    5: ["No.1 委員長", "No.2 裏回し", "No.8 貴族"],
+    6: ["No.2 裏回し", "No.3 アイドル", "No.9 宇宙人"], 
+    7: ["No.3 アイドル", "No.4 考察班", "No.10 全肯定bot"],
+    8: ["No.4 考察班", "No.5 様子見", "No.1 委員長"], 
+    9: ["No.5 様子見", "No.6 保護者", "No.2 裏回し"]
 }
 
 # ==========================================
