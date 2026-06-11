@@ -256,7 +256,7 @@ COMMON_CTA = "ここから先は、膨大な行動データから導き出され
 # 診断コンテンツ (Ver Final_GAS_Link)
 DIAGNOSIS_CONTENT = {
     0: { # Type 1: 甲 (Wood+)
-        "name": "委員長 (THE DRILL SERGEANT)",
+        "name": "委員長",
         "color": "#2E7D32", 
         "catch": "1ミリのズレで発狂する整理整頓の鬼",
         "phrases": ["結論から言って", "ルールなんで", "はぁ…（深いため息）"],
@@ -279,7 +279,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     1: { # Type 2: 乙 (Wood-)
-        "name": "裏回し (THE COORDINATOR)",
+        "name": "裏回し",
         "color": "#2E7D32",
         "catch": "息をするように話を盛って場を繋ぐ",
         "phrases": ["わかる〜！", "なんでもいいよー", "怒ってない？"],
@@ -302,7 +302,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     2: { # Type 3: 丙 (Fire+)
-        "name": "アイドル (THE STAR)",
+        "name": "アイドル",
         "color": "#C62828",
         "catch": "他人の話を聞く機能が「未実装」",
         "phrases": ["ねえ見て見て！", "すごくない！？（私が）", "飽きた"],
@@ -325,7 +325,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     3: { # Type 4: 丁 (Fire-)
-        "name": "考察班 (THE GURU)",
+        "name": "考察班",
         "color": "#C62828",
         "catch": "勝手に期待して勝手に裏切られた気になる",
         "phrases": ["別に…", "誰もわかってくれない", "……（既読スルー）"],
@@ -348,7 +348,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     4: { # Type 5: 戊 (Earth+)
-        "name": "様子見 (THE ELDER)",
+        "name": "様子見",
         "color": "#F9A825",
         "catch": "新しいやり方をとりあえず一度否定する",
         "phrases": ["一旦様子見で", "それ、今やる必要ある？", "めんどくさい"],
@@ -371,7 +371,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     5: { # Type 6: 己 (Earth-)
-        "name": "保護者 (THE MOM)",
+        "name": "保護者",
         "color": "#F9A825",
         "catch": "良かれと思ってダメ人間を製造してしまう",
         "phrases": ["あんたのためを思って！", "大丈夫、あんたならできる！", "ほら言ったでしょ"],
@@ -394,7 +394,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     6: { # Type 7: 庚 (Metal+)
-        "name": "正論マン (THE CAPTAIN)",
+        "name": "正論マン",
         "color": "#546E7A",
         "catch": "「悪気はない」と言えば刺してもいいと思っている",
         "phrases": ["それって意味ある？", "効率悪いね", "要するにさ"],
@@ -417,7 +417,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     7: { # Type 8: 辛 (Metal-)
-        "name": "貴族 (THE ARISTOCRAT)",
+        "name": "貴族",
         "color": "#546E7A",
         "catch": "「一般人扱い」されると原因不明の体調不良になる",
         "phrases": ["私って可哀想", "ありえない", "そうかなぁ？（もっと褒めて）"],
@@ -440,7 +440,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     8: { # Type 9: 壬 (Water+)
-        "name": "宇宙人 (THE ALIEN)",
+        "name": "宇宙人",
         "color": "#1565C0",
         "catch": "予定が決まった瞬間にドタキャンしたくなる",
         "phrases": ["なんとかなるっしょ", "行けたら行く", "束縛しないで"],
@@ -463,7 +463,7 @@ DIAGNOSIS_CONTENT = {
         "cta_text": COMMON_CTA
     },
     9: { # Type 10: 癸 (Water-)
-        "name": "全肯定bot (THE YES-MAN)",
+        "name": "全肯定bot",
         "color": "#1565C0",
         "catch": "争いを避けるためなら死んだふりもする",
         "phrases": ["いいと思います", "すいません", "あ、大丈夫です"],
