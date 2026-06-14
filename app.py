@@ -781,50 +781,40 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         # フォント指定
         FONT_FAMILY = "'UD Mincho', 'UD明朝', 'Noto Serif JP', serif"
 
-        # インデントによるMarkdownコードブロック化を防ぐため、()で囲んで1行ずつ連結します
-        cta_html = (
-            f'<div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">'
-            
-            f'<div style="background-color: {IVORY}; padding: 50px 20px 30px 20px; text-align: center;">'
-            f'<div style="color: {DARK_BROWN}; font-size: 1.6rem; font-weight: bold; margin-bottom: 15px; line-height: 1.4;">あなたの裏側を、読み解く準備が整いました。</div>'
-            f'<div style="color: {GRAY_BROWN}; font-size: 1rem;">LINEで、3つの特典が自動で届きます。</div>'
-            f'</div>'
-
-            f'<div style="background-color: {IVORY}; padding: 0 20px 40px 20px;">'
-            
-            f'<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">'
-            f'<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">特典1：あなたの『裏側』を解き明かす分析メッセージ</div>'
-            f'<ul style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 20px;">'
-            f'<li>あなたの才能が『空回り』するパターン</li>'
-            f'<li>あなたの『性格の特性』を武器に変える戦略</li>'
-            f'<li>あなたが本能的に惹かれる相手のパターン</li>'
-            f'<li>運命の相関関係（神相性・天敵）</li>'
-            f'</ul>'
-            f'</div>'
-
-            f'<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">'
-            f'<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典2：『裏ステータス証明書』</div>'
-            f'<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">あなたの表と裏を、一枚に凝縮した証明書。<br>SNSでもシェアできます。</div>'
-            f'</div>'
-
-            f'<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px;">'
-            f'<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典3：『運命の相関マトリクス図』</div>'
-            f'<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">全10タイプの相関関係を一覧で確認。<br>周りの人を理解する地図になります。</div>'
-            f'</div>'
-            
-            f'</div>'
-
-            f'<div style="background-color: {DARK_BROWN}; padding: 50px 20px; text-align: center;">'
-            f'<div style="color: {IVORY}; font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">3つの特典を、今すぐ受け取る。</div>'
-            f'<div style="color: {GOLD}; font-size: 0.9rem; margin-bottom: 30px;">LINE登録後、自動でお届けします。</div>'
-            f'<a href="{line_link}" target="_blank" style="text-decoration: none;">'
-            f'<div style="background-color: {RED_BROWN}; color: {IVORY}; font-size: 1.2rem; font-weight: bold; padding: 18px 30px; border-radius: 8px; display: inline-block; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">今すぐ、3つの特典を受け取る</div>'
-            f'</a>'
-            f'<div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">▶ LINE登録は無料です</div>'
-            f'</div>'
-            
-            f'</div>'
-        )
+        # ★重要：行頭のスペースを完全に削除して左詰めにしています
+        cta_html = f"""<div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
+<div style="background-color: {IVORY}; padding: 50px 20px 30px 20px; text-align: center;">
+<div style="color: {DARK_BROWN}; font-size: 1.6rem; font-weight: bold; margin-bottom: 15px; line-height: 1.4;">あなたの裏側を、読み解く準備が整いました。</div>
+<div style="color: {GRAY_BROWN}; font-size: 1rem;">LINEで、3つの特典が自動で届きます。</div>
+</div>
+<div style="background-color: {IVORY}; padding: 0 20px 40px 20px;">
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">特典1：あなたの『裏側』を解き明かす分析メッセージ</div>
+<ul style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 20px;">
+<li>あなたの才能が『空回り』するパターン</li>
+<li>あなたの『性格の特性』を武器に変える戦略</li>
+<li>あなたが本能的に惹かれる相手のパターン</li>
+<li>運命の相関関係（神相性・天敵）</li>
+</ul>
+</div>
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典2：『裏ステータス証明書』</div>
+<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">あなたの表と裏を、一枚に凝縮した証明書。<br>SNSでもシェアできます。</div>
+</div>
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px;">
+<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典3：『運命の相関マトリクス図』</div>
+<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">全10タイプの相関関係を一覧で確認。<br>周りの人を理解する地図になります。</div>
+</div>
+</div>
+<div style="background-color: {DARK_BROWN}; padding: 50px 20px; text-align: center;">
+<div style="color: {IVORY}; font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">3つの特典を、今すぐ受け取る。</div>
+<div style="color: {GOLD}; font-size: 0.9rem; margin-bottom: 30px;">LINE登録後、自動でお届けします。</div>
+<a href="{line_link}" target="_blank" style="text-decoration: none;">
+<div style="background-color: {RED_BROWN}; color: {IVORY}; font-size: 1.2rem; font-weight: bold; padding: 18px 30px; border-radius: 8px; display: inline-block; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">今すぐ、3つの特典を受け取る</div>
+</a>
+<div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">▶ LINE登録は無料です</div>
+</div>
+</div>"""
         
         # 3. HTMLの表示
         st.markdown(cta_html, unsafe_allow_html=True)
