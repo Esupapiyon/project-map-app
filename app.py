@@ -729,19 +729,123 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 # === CTA AREA (診断時のみ) ===
     if not is_catalog:
         import urllib.parse
-        
-        # 1. LINEリンク動的生成ロジック（GAS連携用・既存維持）
+
+        # --- 1. Pythonへのロジック移植 (GASから移植) ---
+        def get_lv(val):
+            if val <= 1.9: return 0
+            if val <= 2.7: return 1
+            if val <= 3.3: return 2
+            if val <= 4.1: return 3
+            return 4
+
+        def calc_rank(data):
+            dev = abs(data['ex']-3) + abs(data['op']-3) + \
+                  abs(data['ag']-3) + abs(data['co']-3) + \
+                  abs(data['ne']-3)
+            if dev > 8: return ("UR", "#B89742")
+            elif dev > 6: return ("SSR", "#FF4500")
+            elif dev > 5: return ("SR", "#DA70D6")
+            elif dev > 4: return ("R", "#1E90FF")
+            return ("N", "#A0522D")
+
+        def calc_danger_score(data):
+            score = int(((data['ne'] - 1) * 800 + 
+                         (5.0 - data['ag']) * 400 + 
+                         (5.0 - data['co']) * 300) / 100) * 100
+            return max(0, min(5000, score))
+
+        def get_danger_color(score):
+            if score >= 4375: return "#8B0000"
+            elif score >= 3750: return "#B71C1C"
+            elif score >= 3125: return "#E64A19"
+            elif score >= 2500: return "#F57C00"
+            elif score >= 1875: return "#B89742"
+            elif score >= 1250: return "#9E9D24"
+            elif score >= 625: return "#43A047"
+            return "#1B5E20"
+
+        # ※GASのroleMatrixに合わせて文言を調整してください
+        ROLE_MATRIX = [
+            ["孤高の戦士", "職人", "マイペース", "調整役", "聖母"],
+            ["一匹狼", "実務家", "バランサー", "世話焼き", "ムードメーカー"],
+            ["策士", "参謀", "凡人", "サポート", "愛されキャラ"],
+            ["カリスマ", "リーダー", "人気者", "盛り上げ役", "アイドル"],
+            ["独裁者", "支配者", "王様", "教祖", "神"]
+        ]
+
+        def get_current_role(ex_lv, ag_lv):
+            try:
+                return ROLE_MATRIX[ex_lv][ag_lv]
+            except IndexError:
+                return "解析不能"
+
+        # ※実際のGASのカラーコードに合わせて調整してください
+        TYPE_INFO = [
+            {"name": "委員長", "color": "#4CAF50"},
+            {"name": "裏回し", "color": "#4CAF50"},
+            {"name": "アイドル", "color": "#F44336"},
+            {"name": "考察班", "color": "#F44336"},
+            {"name": "様子見", "color": "#8D6E63"},
+            {"name": "保護者", "color": "#8D6E63"},
+            {"name": "正論マン", "color": "#B0BEC5"},
+            {"name": "貴族", "color": "#B0BEC5"},
+            {"name": "宇宙人", "color": "#2196F3"},
+            {"name": "全肯定bot", "color": "#2196F3"}
+        ]
+
+        CHARA_IMAGES = {
+            1: "static/images/chara_01_committee.png",
+            2: "static/images/chara_02_urakaeshi.png",
+            3: "static/images/chara_03_idol.png",
+            4: "static/images/chara_04_kosatsu.png",
+            5: "static/images/chara_05_yousumi.png",
+            6: "static/images/chara_06_hogosha.png",
+            7: "static/images/chara_07_seironman.png",
+            8: "static/images/chara_08_kizoku.png",
+            9: "static/images/chara_09_uchujin.png",
+            10: "static/images/chara_10_zenkoteibot.png"
+        }
+
+        # --- 2. ユーザー固有データの取得と計算 ---
         # Type IDの特定
         current_type_id = 1
         for k, v in DIAGNOSIS_CONTENT.items():
             if v['name'] == content['name']:
                 current_type_id = k + 1
                 break
-        
-        # 名前が空ならデフォルト設定
-        safe_name = user_name if user_name else "名無し"
 
-        # メッセージ作成（GAS解析用フォーマット）
+        safe_name = user_name if user_name else "あなた"
+        
+        # Big5スコアの取得（取得できない場合はデフォルト値3.0）
+        ex_val = big5_norm.get('Extraversion', 3.0) if big5_norm else 3.0
+        op_val = big5_norm.get('Openness', 3.0) if big5_norm else 3.0
+        ag_val = big5_norm.get('Agreeableness', 3.0) if big5_norm else 3.0
+        co_val = big5_norm.get('Conscientiousness', 3.0) if big5_norm else 3.0
+        ne_val = big5_norm.get('Neuroticism', 3.0) if big5_norm else 3.0
+
+        user_data_calc = {
+            'ex': ex_val, 'op': op_val, 'ag': ag_val, 'co': co_val, 'ne': ne_val
+        }
+
+        # 各種ステータス計算
+        rank_letter, rank_color = calc_rank(user_data_calc)
+        danger_score = calc_danger_score(user_data_calc)
+        danger_color = get_danger_color(danger_score)
+
+        type_info = TYPE_INFO[current_type_id - 1]
+        type_name = type_info['name']
+        type_color = type_info['color']
+        character_image_path = CHARA_IMAGES.get(current_type_id, "static/images/chara_01_committee.png")
+
+        ex_lv = get_lv(ex_val)
+        ag_lv = get_lv(ag_val)
+        current_role = get_current_role(ex_lv, ag_lv)
+
+        # RANK表示用文字列（例: N < R < 【SR】 < SSR < UR）
+        ranks = ["N", "R", "SR", "SSR", "UR"]
+        rank_display = " &lt; ".join([f"【{r}】" if r == rank_letter else r for r in ranks])
+
+        # --- 3. LINEリンク動的生成 ---
         line_text_lines = [
             "【診断データ送信】",
             "詳細レポートとステータスカードを作成します。",
@@ -753,59 +857,159 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         ]
 
         if big5_norm:
-            # 短縮キーでスコアを埋め込む
-            line_text_lines.append(f"EX: {big5_norm.get('Extraversion', 3.0)}")
-            line_text_lines.append(f"OP: {big5_norm.get('Openness', 3.0)}")
-            line_text_lines.append(f"AG: {big5_norm.get('Agreeableness', 3.0)}")
-            line_text_lines.append(f"CO: {big5_norm.get('Conscientiousness', 3.0)}")
-            # Neuroticismは反転せず生の値を送る
-            line_text_lines.append(f"NE: {big5_norm.get('Neuroticism', 3.0)}")
-
+            line_text_lines.append(f"EX: {ex_val}")
+            line_text_lines.append(f"OP: {op_val}")
+            line_text_lines.append(f"AG: {ag_val}")
+            line_text_lines.append(f"CO: {co_val}")
+            line_text_lines.append(f"NE: {ne_val}")
             line_text_lines.append(f"SRC: {st.session_state.traffic_source}")
         
         line_text_lines.append("----------------")
-        
         line_message = "\n".join(line_text_lines)
         encoded_message = urllib.parse.quote(line_message)
         line_link = f"https://line.me/R/oaMessage/@736ihkeb/?{encoded_message}"
 
-        # 2. HTML/CSS構成（ブランドカラー適用・全面書き換え）
-        # ブランドカラー定義
+        # --- 4. HTML/CSS構成（完全版） ---
         IVORY = "#F5F0E6"
         GOLD = "#C9A961"
+        DARK_GOLD = "#B89345"
         DARK_BROWN = "#2A1810"
         RED_BROWN = "#8B3A1F"
         GRAY_BROWN = "#6B5544"
+        LIGHT_BEIGE = "#FCEADE"
         BOX_BG = "#FFFCF9"
         
-        # フォント指定
         FONT_FAMILY = "'UD Mincho', 'UD明朝', 'Noto Serif JP', serif"
 
-        # ★重要：行頭のスペースを完全に削除して左詰めにしています
-        cta_html = f"""<div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
-<div style="background-color: {IVORY}; padding: 50px 20px 30px 20px; text-align: center;">
-<div style="color: {DARK_BROWN}; font-size: 1.6rem; font-weight: bold; margin-bottom: 15px; line-height: 1.4;">あなたの裏側を、読み解く準備が整いました。</div>
-<div style="color: {GRAY_BROWN}; font-size: 1rem;">LINEで、3つの特典が自動で届きます。</div>
+        cta_html = f"""<style>
+.context-bridge {{ text-align: center; margin: 2rem auto; max-width: 500px; padding: 0 1rem; }}
+.context-bridge p {{ color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.7; }}
+.three-benefits-banner {{ display: flex; align-items: center; justify-content: center; background-color: {LIGHT_BEIGE}; border: 2px solid {GOLD}; border-radius: 8px; padding: 1rem 1.5rem; margin: 1rem auto; max-width: 400px; gap: 1rem; }}
+.benefits-number {{ font-size: 3.5rem; font-weight: bold; color: {RED_BROWN}; line-height: 1; }}
+.benefits-text {{ display: flex; flex-direction: column; text-align: left; }}
+.benefits-label {{ font-size: 1.1rem; font-weight: bold; color: {DARK_BROWN}; }}
+.benefits-detail {{ font-size: 0.9rem; color: {GRAY_BROWN}; margin-top: 0.25rem; }}
+
+.certificate-preview-container {{ width: 100%; max-width: 400px; margin: 1.5rem auto; background-color: #FFFFFF; border: 1px solid {GOLD}; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
+.cert-clear-section {{ padding: 0; }}
+.cert-header {{ background-color: {DARK_GOLD}; color: #FFFFFF; font-weight: bold; text-align: center; padding: 1rem; font-size: 1rem; }}
+.cert-body-clear {{ display: flex; padding: 1rem; gap: 1rem; }}
+.cert-avatar {{ flex: 0 0 40%; }}
+.cert-avatar img {{ width: 100%; height: auto; object-fit: contain; }}
+.cert-info {{ flex: 1; display: flex; flex-direction: column; text-align: left; }}
+.cert-name-label, .cert-rank-label, .cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin-top: 0.5rem; }}
+.cert-name-value {{ color: #333333; font-size: 1.15rem; font-weight: bold; word-break: break-all; }}
+.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.5rem 0; }}
+.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }}
+.rank-display {{ color: #AAAAAA; font-size: 0.65rem; }}
+.rank-current {{ font-weight: bold; font-size: 1rem; }}
+.cert-danger-value {{ display: flex; align-items: baseline; }}
+.danger-main {{ font-size: 1rem; font-weight: bold; }}
+.danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; }}
+.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.25rem; }}
+.cert-fate-frame {{ margin: 0.5rem 1rem; padding: 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
+.fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.75rem; }}
+.fate-current {{ color: #FFFFFF; font-size: 0.95rem; font-weight: bold; margin-top: 0.25rem; }}
+
+.cert-blur-section {{ position: relative; padding: 1rem; min-height: 150px; text-align: left; }}
+.cert-blur-content {{ filter: blur(4px); opacity: 0.6; user-select: none; }}
+.blur-section-title {{ color: {DARK_GOLD}; font-size: 0.75rem; font-weight: bold; margin-top: 0.75rem; }}
+.blur-text {{ color: #333333; font-size: 0.8rem; line-height: 1.4; margin-top: 0.25rem; }}
+.blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 40%, rgba(255, 255, 255, 0.95) 100%); pointer-events: none; }}
+.line-cta-text {{ position: absolute; bottom: 1rem; left: 0; width: 100%; text-align: center; color: {GOLD}; font-size: 0.9rem; font-weight: bold; z-index: 2; }}
+
+.matrix-preview-container {{ position: relative; width: 100%; max-width: 400px; margin: 1rem auto; }}
+.matrix-image {{ width: 100%; height: auto; display: block; border-radius: 8px; }}
+.matrix-blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(255, 252, 249, 0) 25%, rgba(255, 252, 249, 0.85) 75%, rgba(255, 252, 249, 1) 100%); pointer-events: none; border-radius: 8px; }}
+.matrix-cta-text {{ text-align: center; color: {GOLD}; font-size: 0.9rem; font-weight: bold; margin-top: -15px; position: relative; z-index: 2; padding-bottom: 5px; }}
+</style>
+<div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
+
+<div style="background-color: {IVORY}; padding: 30px 20px; text-align: center;">
+<div class="context-bridge">
+<p>レーダーチャートに浮かび上がった『ズレ』。<br>これは、あなたの本当の自分が、<br>まだ使いこなされていないという証拠です。</p>
 </div>
+<div style="color: {DARK_BROWN}; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; line-height: 1.4;">
+あなたの裏側を、読み解く準備が整いました。
+</div>
+<div class="three-benefits-banner">
+<span class="benefits-number">3</span>
+<div class="benefits-text">
+<div class="benefits-label">つの特典が</div>
+<div class="benefits-detail">LINEで自動で届きます</div>
+</div>
+</div>
+</div>
+
 <div style="background-color: {IVORY}; padding: 0 20px 40px 20px;">
-<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center;">
+<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典2：あなた専用の『裏ステータス証明書』</div>
+<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">あなたの表と裏を、一枚に凝縮した証明書。<br>SNSでもシェアできます。</div>
+<div class="certificate-preview-container">
+<div class="cert-clear-section">
+<div class="cert-header">裏ステータス証明書</div>
+<div class="cert-body-clear">
+<div class="cert-avatar"><img src="{character_image_path}" alt="character"></div>
+<div class="cert-info">
+<div class="cert-name-label">NAME:</div>
+<div class="cert-name-value">{safe_name}</div>
+<hr class="cert-separator">
+<div class="cert-rank-label">RANK (偏愛度):</div>
+<div class="cert-rank-value">
+<span class="rank-display">{rank_display}</span>
+<span class="rank-current" style="color:{rank_color}">{rank_letter}</span>
+</div>
+<div class="cert-danger-label">危険度スコア:</div>
+<div class="cert-danger-value">
+<span class="danger-main" style="color:{danger_color}">{danger_score}</span>
+<span class="danger-max"> / 5000</span>
+</div>
+<div class="cert-danger-note">※性格の悪さと危険度</div>
+</div>
+</div>
+<div class="cert-fate-frame" style="background-color:{type_color}">
+<div class="fate-label">宿命は『{type_name}』だが、</div>
+<div class="fate-current">現在は『{current_role}』</div>
+</div>
+</div>
+<div class="cert-blur-section">
+<div class="cert-blur-content">
+<div class="blur-section-title">🧬性格分析</div>
+<div class="blur-text">あなたの本質は非常に独特で、周囲からは理解されにくい傾向にあります...</div>
+<div class="blur-section-title">🎭初対面</div>
+<div class="blur-text">第一印象では冷たく見られがちですが、実は...</div>
+<div class="blur-section-title">⚔️ビジネス能力</div>
+<div class="blur-text">特定の分野において圧倒的な集中力を発揮し...</div>
+</div>
+<div class="blur-overlay"></div>
+<div class="line-cta-text">▼ 続きはLINEで受け取る</div>
+</div>
+</div>
+</div>
+
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center;">
+<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典3：『運命の相関マトリクス図』</div>
+<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">全10タイプの相関関係を一覧で確認。<br>周りの人を理解する地図になります。</div>
+<div class="matrix-preview-container">
+<img src="static/images/matrix_preview.png" alt="matrix" class="matrix-image">
+<div class="matrix-blur-overlay"></div>
+<div class="matrix-cta-text">▼ 全タイプの相関はLINEで受け取る</div>
+</div>
+</div>
+
+<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px;">
 <div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">特典1：あなたの『裏側』を解き明かす分析メッセージ</div>
-<ul style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 20px;">
+<ul style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 20px; text-align: left;">
 <li>あなたの才能が『空回り』するパターン</li>
 <li>あなたの『性格の特性』を武器に変える戦略</li>
 <li>あなたが本能的に惹かれる相手のパターン</li>
 <li>運命の相関関係（神相性・天敵）</li>
 </ul>
 </div>
-<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
-<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典2：『裏ステータス証明書』</div>
-<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">あなたの表と裏を、一枚に凝縮した証明書。<br>SNSでもシェアできます。</div>
+
 </div>
-<div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px;">
-<div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典3：『運命の相関マトリクス図』</div>
-<div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">全10タイプの相関関係を一覧で確認。<br>周りの人を理解する地図になります。</div>
-</div>
-</div>
+
 <div style="background-color: {DARK_BROWN}; padding: 50px 20px; text-align: center;">
 <div style="color: {IVORY}; font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">3つの特典を、今すぐ受け取る。</div>
 <div style="color: {GOLD}; font-size: 0.9rem; margin-bottom: 30px;">LINE登録後、自動でお届けします。</div>
@@ -814,13 +1018,14 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 </a>
 <div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">▶ LINE登録は無料です</div>
 </div>
+
 </div>"""
         
-        # 3. HTMLの表示
+        # --- 5. HTMLの表示 ---
         st.markdown(cta_html, unsafe_allow_html=True)
         
     else:
-        st.caption("※ 実際の診断では、ここに「裏性格のレポート受け取りフォーム」が表示されます。")
+        st.caption("※ 実際の診断では、ここに「特典受け取りと詳細レポート」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
