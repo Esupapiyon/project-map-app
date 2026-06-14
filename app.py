@@ -726,11 +726,11 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     )
     st.plotly_chart(fig, use_container_width=True, config={'staticPlot': True}, key=f"radar_{key_suffix}")
 
-    # === CTA AREA (診断時のみ) ===
+# === CTA AREA (診断時のみ) ===
     if not is_catalog:
         import urllib.parse
         
-        # 1. LINEリンク動的生成ロジック（GAS連携用）
+        # 1. LINEリンク動的生成ロジック（GAS連携用・既存維持）
         # Type IDの特定
         current_type_id = 1
         for k, v in DIAGNOSIS_CONTENT.items():
@@ -758,7 +758,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             line_text_lines.append(f"OP: {big5_norm.get('Openness', 3.0)}")
             line_text_lines.append(f"AG: {big5_norm.get('Agreeableness', 3.0)}")
             line_text_lines.append(f"CO: {big5_norm.get('Conscientiousness', 3.0)}")
-            # Neuroticismは反転せず生の値を送る（GAS側で処理統一するため）
+            # Neuroticismは反転せず生の値を送る
             line_text_lines.append(f"NE: {big5_norm.get('Neuroticism', 3.0)}")
 
             line_text_lines.append(f"SRC: {st.session_state.traffic_source}")
@@ -769,35 +769,94 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         encoded_message = urllib.parse.quote(line_message)
         line_link = f"https://line.me/R/oaMessage/@736ihkeb/?{encoded_message}"
 
-        # 2. 上部ボタン表示
-        st.link_button("👉 ズレを武器に変える『裏・攻略法』を見る（LINE登録）", line_link, type="primary", use_container_width=True)
+        # 2. HTML/CSS構成（ブランドカラー適用・全面書き換え）
+        # ブランドカラー定義
+        IVORY = "#F5F0E6"
+        GOLD = "#C9A961"
+        DARK_BROWN = "#2A1810"
+        RED_BROWN = "#8B3A1F"
+        GRAY_BROWN = "#6B5544"
+        BOX_BG = "#FFFCF9"
         
-        # 3. HTML表示（インデント問題を回避するため、改行コードを削除して連結）
-        cta_html = (
-            '<div style="margin-top: 30px; background-color: #FAFAFA; border: 3px solid #D32F2F; border-radius: 15px; padding: 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">'
-            '<div style="background: #D32F2F; color: #fff; font-weight: 900; font-size: 1.1rem; padding: 8px 20px; border-radius: 30px; display: inline-block; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">🔒 LINE限定：心理学ロジックで解き明かす『あなたの真実』</div>'
-            '<div style="text-align: left; margin: 0 auto 25px auto; display: inline-block; width: 95%;">'
-            '<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;"><span style="color: #D32F2F; font-size: 1.3rem;">【警告】</span>あなたの才能が『自滅』するパターンの特定</div>'
-            '<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;"><span style="color: #D32F2F; font-size: 1.3rem;">【仕事】</span>努力は不要。あなたの『性格の悪さ』をお金に変える錬金術</div>'
-            '<div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: #333; line-height: 1.5;"><span style="color: #D32F2F; font-size: 1.3rem;">【恋愛】</span>※閲覧注意※ あなたが本能的に惹かれる『破滅させる相手』</div>'
-            '</div>'
-            '<div style="background-color: #FFFDE7; border: 2px solid #FFD600; padding: 15px; border-radius: 10px; margin-bottom: 15px;"><div style="color: #E65100; font-weight: 900; font-size: 1.3rem; line-height: 1.4;">【相性】全タイプ網羅！<br>『運命の相関マトリクス図』</div></div>'
-            '<div style="background-color: #FFEBEE; border: 2px solid #FF5252; padding: 15px; border-radius: 10px; margin-bottom: 20px;"><div style="color: #C62828; font-weight: 900; font-size: 1.3rem; line-height: 1.4; margin-bottom: 8px;">【登録特典】あなたの『表と裏』を一枚に！<br>『ステータス診断カード』</div><div style="font-size: 0.95rem; font-weight: bold; color: #555;">※ 登録後すぐに自動で送られます。<br>SNSでシェアして本当の自分を表現しよう。</div></div>'
-            '<div style="filter: blur(5px); opacity: 0.6; user-select: none; font-size: 0.8rem; padding-bottom: 40px;">ここにあなたの性格の裏側に関する詳細なレポートが表示されます。なぜあなたは人間関係で同じ失敗を繰り返してしまうのか？その原因は幼少期の体験にあるかもしれません。このレポートを読むことで、あなたは二度と同じ過ちを繰り返さず、本来の輝きを取り戻すことができるでしょう...</div>'
-            '<div class="lock-overlay" style="position: absolute; top: 85%; left: 50%; transform: translate(-50%, -50%); width: 100%; z-index: 10;">'
-            f'<a href="{line_link}" target="_blank" style="text-decoration: none;">'
-            '<div style="background: rgba(255,255,255,0.95); display: inline-block; padding: 12px 24px; border-radius: 50px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">'
-            '<span style="font-weight:bold; font-size:1rem; color:#333; display: flex; align-items: center; justify-content: center; gap: 5px;">🔒 現在の性格の詳細なレポートを今すぐ読む（無料）</span>'
-            '</div></a></div></div>'
-        )
+        # フォント指定
+        FONT_FAMILY = "'UD Mincho', 'UD明朝', 'Noto Serif JP', serif"
+
+        # 複数行の文字列をf-stringで一括定義
+        cta_html = f"""
+        <div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
+            
+            <div style="background-color: {IVORY}; padding: 50px 20px 30px 20px; text-align: center;">
+                <div style="color: {DARK_BROWN}; font-size: 1.6rem; font-weight: bold; margin-bottom: 15px; line-height: 1.4;">
+                    あなたの裏側を、読み解く準備が整いました。
+                </div>
+                <div style="color: {GRAY_BROWN}; font-size: 1rem;">
+                    LINEで、3つの特典が自動で届きます。
+                </div>
+            </div>
+
+            <div style="background-color: {IVORY}; padding: 0 20px 40px 20px;">
+                
+                <div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+                    <div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px;">
+                        特典1：あなたの『裏側』を解き明かす分析メッセージ
+                    </div>
+                    <ul style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 20px;">
+                        <li>あなたの才能が『空回り』するパターン</li>
+                        <li>あなたの『性格の特性』を武器に変える戦略</li>
+                        <li>あなたが本能的に惹かれる相手のパターン</li>
+                        <li>運命の相関関係（神相性・天敵）</li>
+                    </ul>
+                </div>
+
+                <div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px; margin-bottom: 20px;">
+                    <div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">
+                        特典2：『裏ステータス証明書』
+                    </div>
+                    <div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">
+                        あなたの表と裏を、一枚に凝縮した証明書。<br>
+                        SNSでもシェアできます。
+                    </div>
+                </div>
+
+                <div style="background-color: {BOX_BG}; border: 1px solid {GOLD}; border-radius: 8px; padding: 25px;">
+                    <div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">
+                        特典3：『運命の相関マトリクス図』
+                    </div>
+                    <div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">
+                        全10タイプの相関関係を一覧で確認。<br>
+                        周りの人を理解する地図になります。
+                    </div>
+                </div>
+                
+            </div>
+
+            <div style="background-color: {DARK_BROWN}; padding: 50px 20px; text-align: center;">
+                <div style="color: {IVORY}; font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">
+                    3つの特典を、今すぐ受け取る。
+                </div>
+                <div style="color: {GOLD}; font-size: 0.9rem; margin-bottom: 30px;">
+                    LINE登録後、自動でお届けします。
+                </div>
+                
+                <a href="{line_link}" target="_blank" style="text-decoration: none;">
+                    <div style="background-color: {RED_BROWN}; color: {IVORY}; font-size: 1.2rem; font-weight: bold; padding: 18px 30px; border-radius: 8px; display: inline-block; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                        今すぐ、3つの特典を受け取る
+                    </div>
+                </a>
+                
+                <div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">
+                    ▶ LINE登録は無料です
+                </div>
+            </div>
+            
+        </div>
+        """
         
+        # 3. HTMLの表示
         st.markdown(cta_html, unsafe_allow_html=True)
         
-        # 4. 下部ボタン表示
-        st.link_button("あなたの裏側のレポートを今すぐ読む（無料）", line_link, type="primary", use_container_width=True)
-        
     else:
-        st.caption("※ 実際の診断では、ここに「裏性格のレーダーチャート」が表示されます。")
+        st.caption("※ 実際の診断では、ここに「裏性格のレポート受け取りフォーム」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
