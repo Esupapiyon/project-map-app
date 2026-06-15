@@ -764,7 +764,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             elif score >= 625: return "#43A047"
             return "#1B5E20"
 
-        # GAS本番環境の文言に完全同期
         ROLE_MATRIX = [
             ["ステルス忍者", "壁の花", "ふつうの人", "作り笑い人形", "応援団長"],
             ["歩く火薬庫", "心のシャッター", "事なかれ主義者", "何でも屋", "肯定マシーン"],
@@ -779,7 +778,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             except IndexError:
                 return "謎の存在"
 
-        # GAS本番コードのカラーコードに完全同期
         TYPE_INFO = [
             {"name": "委員長", "color": "#2E7D32"},    # 1 木 (緑)
             {"name": "裏回し", "color": "#2E7D32"},    # 2 木 (緑)
@@ -793,21 +791,23 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             {"name": "全肯定bot", "color": "#1565C0"}  # 10 水 (青)
         ]
 
+        # Googleドライブの公開URLに完全同期
         CHARA_IMAGES = {
-            1: "static/images/chara_01_committee.png",
-            2: "static/images/chara_02_urakaeshi.png",
-            3: "static/images/chara_03_idol.png",
-            4: "static/images/chara_04_kosatsu.png",
-            5: "static/images/chara_05_yousumi.png",
-            6: "static/images/chara_06_hogosha.png",
-            7: "static/images/chara_07_seironman.png",
-            8: "static/images/chara_08_kizoku.png",
-            9: "static/images/chara_09_uchujin.png",
-            10: "static/images/chara_10_zenkoteibot.png"
+            1: "https://drive.google.com/uc?export=view&id=12BIx4wfmNW_URILG8KXI1QTSJv23dv4F", 
+            2: "https://drive.google.com/uc?export=view&id=1GclGt7lXjr7OO3pWsTq3rxvx8UHUefNe",
+            3: "https://drive.google.com/uc?export=view&id=1wb7_KH1rLje9BO8Uuki8uWRpsO6fTM3m", 
+            4: "https://drive.google.com/uc?export=view&id=13D_WJ0JbLTjBGxoSSejTthcBKKgj2XT7",
+            5: "https://drive.google.com/uc?export=view&id=1b23nZPzx2jaiDzPsyUQ0GTE-SdIBrntX", 
+            6: "https://drive.google.com/uc?export=view&id=1v0AsBKb81UZDmA0UcxF9uq-cCKgQmhmo",
+            7: "https://drive.google.com/uc?export=view&id=1p95y9uSoaPgneV79uPFijBiiqWYW8thI", 
+            8: "https://drive.google.com/uc?export=view&id=1njXRX373IFSeOlp32eTCW1JHCL7aMZ7z",
+            9: "https://drive.google.com/uc?export=view&id=1pxtI5OaPV2JrmJRibtOGUbUve-N4gC5A", 
+            10: "https://drive.google.com/uc?export=view&id=1zbi5zbcxrQFzrCmNSSWGTHUvfkQ-AgAG"
         }
 
+        MATRIX_IMAGE_URL = "https://drive.google.com/uc?export=view&id=15ValNOTgUeO3f8dzA6DqH-MUbNd3FQU-"
+
         # --- 2. ユーザー固有データの取得と計算 ---
-        # Type IDの特定
         current_type_id = 1
         for k, v in DIAGNOSIS_CONTENT.items():
             if v['name'] == content['name']:
@@ -816,7 +816,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
         safe_name = user_name if user_name else "あなた"
         
-        # Big5スコアの取得（取得できない場合はデフォルト値3.0）
         ex_val = big5_norm.get('Extraversion', 3.0) if big5_norm else 3.0
         op_val = big5_norm.get('Openness', 3.0) if big5_norm else 3.0
         ag_val = big5_norm.get('Agreeableness', 3.0) if big5_norm else 3.0
@@ -827,7 +826,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             'ex': ex_val, 'op': op_val, 'ag': ag_val, 'co': co_val, 'ne': ne_val
         }
 
-        # 各種ステータス計算
         rank_letter, rank_color = calc_rank(user_data_calc)
         danger_score = calc_danger_score(user_data_calc)
         danger_color = get_danger_color(danger_score)
@@ -835,13 +833,12 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         type_info = TYPE_INFO[current_type_id - 1]
         type_name = type_info['name']
         type_color = type_info['color']
-        character_image_path = CHARA_IMAGES.get(current_type_id, "static/images/chara_01_committee.png")
+        character_image_path = CHARA_IMAGES.get(current_type_id, CHARA_IMAGES[1])
 
         ex_lv = get_lv(ex_val)
         ag_lv = get_lv(ag_val)
         current_role = get_current_role(ex_lv, ag_lv)
 
-        # RANK表示用文字列（例: N < R < 【SR】 < SSR < UR）
         ranks = ["N", "R", "SR", "SSR", "UR"]
         rank_display = " &lt; ".join([f"【{r}】" if r == rank_letter else r for r in ranks])
 
@@ -881,7 +878,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         
         FONT_FAMILY = "'UD Mincho', 'UD明朝', 'Noto Serif JP', serif"
 
-        # 背景色に応じて文字色を自動判定（GASの視認性対策ロジックを再現）
         if type_color in ["#F9A825", "#C0C0C0"]:
             frame_text_color = "#333333"
             frame_label_color = "#666666"
@@ -1000,7 +996,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 <div style="color: {GOLD}; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">特典3：『運命の相関マトリクス図』</div>
 <div style="color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.6;">全10タイプの相関関係を一覧で確認。<br>周りの人を理解する地図になります。</div>
 <div class="matrix-preview-container">
-<img src="static/images/matrix_preview.png" alt="matrix" class="matrix-image">
+<img src="{MATRIX_IMAGE_URL}" alt="matrix" class="matrix-image">
 <div class="matrix-blur-overlay"></div>
 <div class="matrix-cta-text">▼ 全タイプの相関はLINEで受け取る</div>
 </div>
@@ -1036,7 +1032,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         st.caption("※ 実際の診断では、ここに「特典受け取りと詳細レポート」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
-
 
 # ==========================================
 # 6. Main UI Application (Ver Final_UI_Tweak)
