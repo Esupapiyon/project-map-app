@@ -209,9 +209,9 @@ st.markdown("""
 def load_image(type_id):
     """画像パス探索（ローカルのimagesフォルダから読み込む安定版）"""
     target_id = type_id
-    # 元の仕様にあった8と9の入れ替えロジック
-    if type_id == 8: target_id = 9
-    elif type_id == 9: target_id = 8
+    
+    # === 不要になった入れ替えロジックを削除 ===
+    # (ここに書かれていた if と elif の入れ替え処理を消去しました)
         
     extensions = ['.png', '.jpg', '.jpeg', '.PNG', '.JPG']
     base_dir = "images"
