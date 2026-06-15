@@ -754,7 +754,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
                          (5.0 - data['co']) * 300) / 100) * 100
             return max(0, min(5000, score))
 
-        # GAS本番環境の文言に完全同期
         ROLE_MATRIX = [
             ["ステルス忍者", "壁の花", "ふつうの人", "作り笑い人形", "応援団長"],
             ["歩く火薬庫", "心のシャッター", "事なかれ主義者", "何でも屋", "肯定マシーン"],
@@ -769,7 +768,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             except IndexError:
                 return "謎の存在"
 
-        # 五行カラーをGAS本番環境に完全同期
         TYPE_INFO = [
             {"name": "委員長", "color": "#2E7D32"},    # 1 木 (緑)
             {"name": "裏回し", "color": "#2E7D32"},    # 2 木 (緑)
@@ -783,7 +781,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             {"name": "全肯定bot", "color": "#1565C0"}  # 10 水 (青)
         ]
 
-        # GitHubのRaw URLを指定（1.png 〜 10.png に完全対応）
         CHARA_IMAGES = {
             1: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/1.png",
             2: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/2.png",
@@ -797,7 +794,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             10: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/10.png"
         }
 
-        # マトリクス図のGitHub Raw URLを指定
         MATRIX_IMAGE_URL = "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/matrix_preview.png"
 
         # --- 2. ユーザー固有データの取得と計算 ---
@@ -821,8 +817,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
         rank_letter, rank_color = calc_rank(user_data_calc)
         danger_score = calc_danger_score(user_data_calc)
-        
-        # 危険度スコアのカラーをブランドカラー（赤茶色）に固定
         danger_color = "#8B3A1F"
 
         type_info = TYPE_INFO[current_type_id - 1]
@@ -893,27 +887,29 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 .cert-clear-section {{ padding: 0; }}
 .cert-header {{ background-color: {DARK_GOLD}; color: #FFFFFF; font-weight: bold; text-align: center; padding: 1rem; font-size: 1rem; }}
 
-/* 左右カラムを「上揃え」にし、下部の余白を削る */
 .cert-body-clear {{ display: flex; padding: 1rem 1rem 0.5rem 1rem; gap: 0.5rem; align-items: flex-start; }}
 .cert-avatar {{ flex: 0 0 42%; display: flex; align-items: flex-start; justify-content: center; }}
 .cert-avatar img {{ width: 100%; height: auto; max-height: 220px; object-fit: contain; }}
 
-/* ★テキストの行間と余白を限界まで詰めてNAMEとRANKを密着させる */
+/* ★テキストの行間と余白を限界（px単位）まで詰める */
 .cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; padding-top: 0; }}
 .cert-name-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-name-value {{ color: #333333; font-size: 1.25rem; font-weight: bold; word-break: break-all; margin: 0.1rem 0 0 0; line-height: 1.1; }}
-.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.15rem 0; }}
+.cert-name-value {{ color: #333333; font-size: 1.25rem; font-weight: bold; word-break: break-all; margin: 2px 0 0 0; line-height: 1; }}
+
+/* ★グレーの線の上下余白をたったの「2px」に強制指定 */
+.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 2px 0 2px 0; padding: 0; }}
+
 .cert-rank-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.1rem 0 0.3rem 0; line-height: 1; }}
+.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 2px 0 6px 0; line-height: 1; }}
 .rank-display {{ color: #AAAAAA; font-size: 0.65rem; line-height: 1; }}
 .rank-current {{ font-weight: bold; font-size: 1.1rem; line-height: 1; }}
-.cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.1rem; line-height: 1; }}
-.danger-main {{ font-size: 1.1rem; font-weight: bold; line-height: 1; }}
-.danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; line-height: 1; }}
-.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.1rem; line-height: 1; }}
 
-/* フレームの上の余白を0にしてキャラ画像に近づける */
+.cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
+.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 2px; line-height: 1; }}
+.danger-main {{ font-size: 1.1rem; font-weight: bold; line-height: 1; }}
+.danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 4px; line-height: 1; }}
+.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 2px; line-height: 1; }}
+
 .cert-fate-frame {{ margin: 0 1rem 1rem 1rem; padding: 0.5rem 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
 .fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.7rem; }}
 .fate-current {{ color: #FFFFFF; font-size: 0.85rem; font-weight: bold; margin-top: 0.15rem; }}
