@@ -893,32 +893,31 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 .cert-clear-section {{ padding: 0; }}
 .cert-header {{ background-color: {DARK_GOLD}; color: #FFFFFF; font-weight: bold; text-align: center; padding: 1rem; font-size: 1rem; }}
 
-/* ★修正2: 左右カラムを垂直中央揃え */
-.cert-body-clear {{ display: flex; padding: 1rem; gap: 1rem; align-items: center; }}
-.cert-avatar {{ flex: 0 0 40%; display: flex; align-items: center; justify-content: center; }}
-.cert-avatar img {{ width: 100%; height: auto; max-height: 180px; object-fit: contain; }}
+/* ★本物に合わせて左右カラムを「上揃え」にし、下部の余白を削る */
+.cert-body-clear {{ display: flex; padding: 1rem 1rem 0.5rem 1rem; gap: 0.5rem; align-items: flex-start; }}
+.cert-avatar {{ flex: 0 0 42%; display: flex; align-items: flex-start; justify-content: center; }}
+.cert-avatar img {{ width: 100%; height: auto; max-height: 220px; object-fit: contain; }}
 
-/* ★修正1: 要素間marginの統一・不要な空白の削除 */
-.cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; }}
-.cert-name-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
-.cert-name-value {{ color: #333333; font-size: 1.15rem; font-weight: bold; word-break: break-all; margin: 0; margin-top: 0.25rem; }}
-.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.5rem 0; }}
-.cert-rank-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
-.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem; margin-bottom: 0.5rem; }}
-.rank-display {{ color: #AAAAAA; font-size: 0.65rem; }}
-.rank-current {{ font-weight: bold; font-size: 1rem; }}
-.cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
-.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.25rem; }}
-.danger-main {{ font-size: 1rem; font-weight: bold; }}
-.danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; }}
-.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.25rem; }}
+/* ★テキストの行間(line-height)と余白(margin)を極限まで詰める */
+.cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; padding-top: 0.2rem; }}
+.cert-name-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
+.cert-name-value {{ color: #333333; font-size: 1.25rem; font-weight: bold; word-break: break-all; margin: 0.15rem 0 0 0; line-height: 1.2; }}
+.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.3rem 0; }}
+.cert-rank-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
+.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.15rem 0 0.4rem 0; line-height: 1; }}
+.rank-display {{ color: #AAAAAA; font-size: 0.65rem; line-height: 1; }}
+.rank-current {{ font-weight: bold; font-size: 1.1rem; line-height: 1; }}
+.cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
+.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.15rem; line-height: 1; }}
+.danger-main {{ font-size: 1.1rem; font-weight: bold; line-height: 1; }}
+.danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; line-height: 1; }}
+.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.15rem; line-height: 1; }}
 
-/* ★修正5: 宿命vs現在フレームのサイズ・視覚階層調整 */
-.cert-fate-frame {{ margin: 0.25rem 1rem 1rem 1rem; padding: 0.5rem 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
+/* ★フレームの上の余白を0にしてキャラ画像に近づける */
+.cert-fate-frame {{ margin: 0 1rem 1rem 1rem; padding: 0.5rem 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
 .fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.7rem; }}
 .fate-current {{ color: #FFFFFF; font-size: 0.85rem; font-weight: bold; margin-top: 0.15rem; }}
 
-/* ★修正6, 7: 本文ぼかし強化・CTAテキスト位置調整 */
 .cert-blur-section {{ position: relative; padding: 1rem; min-height: 120px; text-align: left; }}
 .cert-blur-content {{ filter: blur(6px); -webkit-filter: blur(6px); opacity: 0.5; user-select: none; }}
 .blur-section-title {{ color: {DARK_GOLD}; font-size: 0.75rem; font-weight: bold; margin-top: 0.75rem; }}
@@ -926,7 +925,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 .blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 40%, rgba(255, 255, 255, 0.95) 100%); pointer-events: none; }}
 .line-cta-text {{ position: absolute; bottom: 0.75rem; left: 0; width: 100%; text-align: center; color: {GOLD}; font-size: 0.85rem; font-weight: bold; z-index: 2; }}
 
-/* ★修正3: マトリクス図のぼかし大幅強化 */
 .matrix-preview-container {{ position: relative; width: 100%; max-width: 400px; margin: 1rem auto; }}
 .matrix-image {{ width: 100%; height: auto; display: block; border-radius: 8px; filter: blur(6px); -webkit-filter: blur(6px); }}
 .matrix-blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(245, 240, 230, 0.3) 0%, rgba(245, 240, 230, 0.85) 50%, rgba(245, 240, 230, 1) 100%); pointer-events: none; border-radius: 8px; }}
