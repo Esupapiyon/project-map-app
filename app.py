@@ -730,7 +730,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
     if not is_catalog:
         import urllib.parse
 
-        # --- 1. Pythonへのロジック移植 (GASから移植) ---
+        # --- 1. Pythonへのロジック移植 (GAS本番コードより完全移植) ---
         def get_lv(val):
             if val <= 1.9: return 0
             if val <= 2.7: return 1
@@ -764,33 +764,33 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             elif score >= 625: return "#43A047"
             return "#1B5E20"
 
-        # ※GASのroleMatrixに合わせて文言を調整してください
+        # GAS本番環境の文言に完全同期
         ROLE_MATRIX = [
-            ["孤高の戦士", "職人", "マイペース", "調整役", "聖母"],
-            ["一匹狼", "実務家", "バランサー", "世話焼き", "ムードメーカー"],
-            ["策士", "参謀", "凡人", "サポート", "愛されキャラ"],
-            ["カリスマ", "リーダー", "人気者", "盛り上げ役", "アイドル"],
-            ["独裁者", "支配者", "王様", "教祖", "神"]
+            ["ステルス忍者", "壁の花", "ふつうの人", "作り笑い人形", "応援団長"],
+            ["歩く火薬庫", "心のシャッター", "事なかれ主義者", "何でも屋", "肯定マシーン"],
+            ["論破王", "一匹狼", "背景キャラ", "調整役", "後輩キャラ"],
+            ["体育会系", "仕切り屋", "ムードメーカー", "お節介焼き", "渡り鳥"],
+            ["暴走列車", "番長", "陽キャの極み", "宴会部長", "カリスマ教祖"]
         ]
 
         def get_current_role(ex_lv, ag_lv):
             try:
                 return ROLE_MATRIX[ex_lv][ag_lv]
             except IndexError:
-                return "解析不能"
+                return "謎の存在"
 
-        # ※実際のGASのカラーコードに合わせて調整してください
+        # GAS本番コードのカラーコードに完全同期
         TYPE_INFO = [
-            {"name": "委員長", "color": "#4CAF50"},
-            {"name": "裏回し", "color": "#4CAF50"},
-            {"name": "アイドル", "color": "#F44336"},
-            {"name": "考察班", "color": "#F44336"},
-            {"name": "様子見", "color": "#8D6E63"},
-            {"name": "保護者", "color": "#8D6E63"},
-            {"name": "正論マン", "color": "#B0BEC5"},
-            {"name": "貴族", "color": "#B0BEC5"},
-            {"name": "宇宙人", "color": "#2196F3"},
-            {"name": "全肯定bot", "color": "#2196F3"}
+            {"name": "委員長", "color": "#2E7D32"},    # 1 木 (緑)
+            {"name": "裏回し", "color": "#2E7D32"},    # 2 木 (緑)
+            {"name": "アイドル", "color": "#C62828"},  # 3 火 (赤)
+            {"name": "考察班", "color": "#C62828"},    # 4 火 (赤)
+            {"name": "様子見", "color": "#F9A825"},    # 5 金 (黄)
+            {"name": "保護者", "color": "#F9A825"},    # 6 金 (黄)
+            {"name": "正論マン", "color": "#C0C0C0"},  # 7 土 (銀)
+            {"name": "貴族", "color": "#C0C0C0"},      # 8 土 (銀)
+            {"name": "宇宙人", "color": "#1565C0"},    # 9 水 (青)
+            {"name": "全肯定bot", "color": "#1565C0"}  # 10 水 (青)
         ]
 
         CHARA_IMAGES = {
@@ -881,6 +881,14 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         
         FONT_FAMILY = "'UD Mincho', 'UD明朝', 'Noto Serif JP', serif"
 
+        # 背景色に応じて文字色を自動判定（GASの視認性対策ロジックを再現）
+        if type_color in ["#F9A825", "#C0C0C0"]:
+            frame_text_color = "#333333"
+            frame_label_color = "#666666"
+        else:
+            frame_text_color = "#FFFFFF"
+            frame_label_color = "#EEEEEE"
+
         cta_html = f"""<style>
 .context-bridge {{ text-align: center; margin: 2rem auto; max-width: 500px; padding: 0 1rem; }}
 .context-bridge p {{ color: {DARK_BROWN}; font-size: 0.95rem; line-height: 1.7; }}
@@ -969,8 +977,8 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 </div>
 </div>
 <div class="cert-fate-frame" style="background-color:{type_color}">
-<div class="fate-label">宿命は『{type_name}』だが、</div>
-<div class="fate-current">現在は『{current_role}』</div>
+<div class="fate-label" style="color:{frame_label_color}">宿命は『{type_name}』だが、</div>
+<div class="fate-current" style="color:{frame_text_color}">現在は『{current_role}』</div>
 </div>
 </div>
 <div class="cert-blur-section">
