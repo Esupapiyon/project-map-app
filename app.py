@@ -791,21 +791,22 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             {"name": "全肯定bot", "color": "#1565C0"}  # 10 水 (青)
         ]
 
-        # Googleドライブの公開URLに完全同期
+        # ★GitHubのRaw URLを指定（1.png 〜 10.png に完全対応）
         CHARA_IMAGES = {
-            1: "https://drive.google.com/uc?export=view&id=12BIx4wfmNW_URILG8KXI1QTSJv23dv4F", 
-            2: "https://drive.google.com/uc?export=view&id=1GclGt7lXjr7OO3pWsTq3rxvx8UHUefNe",
-            3: "https://drive.google.com/uc?export=view&id=1wb7_KH1rLje9BO8Uuki8uWRpsO6fTM3m", 
-            4: "https://drive.google.com/uc?export=view&id=13D_WJ0JbLTjBGxoSSejTthcBKKgj2XT7",
-            5: "https://drive.google.com/uc?export=view&id=1b23nZPzx2jaiDzPsyUQ0GTE-SdIBrntX", 
-            6: "https://drive.google.com/uc?export=view&id=1v0AsBKb81UZDmA0UcxF9uq-cCKgQmhmo",
-            7: "https://drive.google.com/uc?export=view&id=1p95y9uSoaPgneV79uPFijBiiqWYW8thI", 
-            8: "https://drive.google.com/uc?export=view&id=1njXRX373IFSeOlp32eTCW1JHCL7aMZ7z",
-            9: "https://drive.google.com/uc?export=view&id=1pxtI5OaPV2JrmJRibtOGUbUve-N4gC5A", 
-            10: "https://drive.google.com/uc?export=view&id=1zbi5zbcxrQFzrCmNSSWGTHUvfkQ-AgAG"
+            1: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/1.png",
+            2: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/2.png",
+            3: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/3.png",
+            4: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/4.png",
+            5: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/5.png",
+            6: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/6.png",
+            7: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/7.png",
+            8: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/8.png",
+            9: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/9.png",
+            10: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/10.png"
         }
 
-        MATRIX_IMAGE_URL = "https://drive.google.com/uc?export=view&id=15ValNOTgUeO3f8dzA6DqH-MUbNd3FQU-"
+        # ★マトリクス図のGitHub Raw URLを指定
+        MATRIX_IMAGE_URL = "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/matrix_preview.png"
 
         # --- 2. ユーザー固有データの取得と計算 ---
         current_type_id = 1
