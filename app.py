@@ -822,7 +822,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         rank_letter, rank_color = calc_rank(user_data_calc)
         danger_score = calc_danger_score(user_data_calc)
         
-        # ★修正4：危険度スコアのカラーをブランドカラー（赤茶色）に固定
+        # 危険度スコアのカラーをブランドカラー（赤茶色）に固定
         danger_color = "#8B3A1F"
 
         type_info = TYPE_INFO[current_type_id - 1]
@@ -893,27 +893,27 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 .cert-clear-section {{ padding: 0; }}
 .cert-header {{ background-color: {DARK_GOLD}; color: #FFFFFF; font-weight: bold; text-align: center; padding: 1rem; font-size: 1rem; }}
 
-/* ★本物に合わせて左右カラムを「上揃え」にし、下部の余白を削る */
+/* 左右カラムを「上揃え」にし、下部の余白を削る */
 .cert-body-clear {{ display: flex; padding: 1rem 1rem 0.5rem 1rem; gap: 0.5rem; align-items: flex-start; }}
 .cert-avatar {{ flex: 0 0 42%; display: flex; align-items: flex-start; justify-content: center; }}
 .cert-avatar img {{ width: 100%; height: auto; max-height: 220px; object-fit: contain; }}
 
-/* ★テキストの行間(line-height)と余白(margin)を極限まで詰める */
-.cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; padding-top: 0.2rem; }}
+/* ★テキストの行間と余白を限界まで詰めてNAMEとRANKを密着させる */
+.cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; padding-top: 0; }}
 .cert-name-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-name-value {{ color: #333333; font-size: 1.25rem; font-weight: bold; word-break: break-all; margin: 0.15rem 0 0 0; line-height: 1.2; }}
-.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.3rem 0; }}
+.cert-name-value {{ color: #333333; font-size: 1.25rem; font-weight: bold; word-break: break-all; margin: 0.1rem 0 0 0; line-height: 1.1; }}
+.cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.15rem 0; }}
 .cert-rank-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.15rem 0 0.4rem 0; line-height: 1; }}
+.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.1rem 0 0.3rem 0; line-height: 1; }}
 .rank-display {{ color: #AAAAAA; font-size: 0.65rem; line-height: 1; }}
 .rank-current {{ font-weight: bold; font-size: 1.1rem; line-height: 1; }}
 .cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; line-height: 1; }}
-.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.15rem; line-height: 1; }}
+.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.1rem; line-height: 1; }}
 .danger-main {{ font-size: 1.1rem; font-weight: bold; line-height: 1; }}
 .danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; line-height: 1; }}
-.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.15rem; line-height: 1; }}
+.cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.1rem; line-height: 1; }}
 
-/* ★フレームの上の余白を0にしてキャラ画像に近づける */
+/* フレームの上の余白を0にしてキャラ画像に近づける */
 .cert-fate-frame {{ margin: 0 1rem 1rem 1rem; padding: 0.5rem 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
 .fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.7rem; }}
 .fate-current {{ color: #FFFFFF; font-size: 0.85rem; font-weight: bold; margin-top: 0.15rem; }}
@@ -1035,7 +1035,6 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         st.caption("※ 実際の診断では、ここに「特典受け取りと詳細レポート」が表示されます。")
 
     st.markdown('</div>', unsafe_allow_html=True)
-
 # ==========================================
 # 6. Main UI Application (Ver Final_UI_Tweak)
 # ==========================================
