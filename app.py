@@ -1019,7 +1019,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 <a href="{line_link}" target="_blank" style="text-decoration: none;">
 <div style="background-color: {RED_BROWN}; color: {IVORY}; font-size: 1.2rem; font-weight: bold; padding: 18px 30px; border-radius: 8px; display: inline-block; width: 90%; max-width: 450px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s;">今すぐ、3つの特典を受け取る</div>
 </a>
-<div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">▶ LINE登録は無料です</div>
+<div style="color: {GOLD}; font-size: 0.85rem; margin-top: 20px;">▶︎ LINE登録は無料です</div>
 </div>
 
 </div>"""
