@@ -754,16 +754,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
                          (5.0 - data['co']) * 300) / 100) * 100
             return max(0, min(5000, score))
 
-        def get_danger_color(score):
-            if score >= 4375: return "#8B0000"
-            elif score >= 3750: return "#B71C1C"
-            elif score >= 3125: return "#E64A19"
-            elif score >= 2500: return "#F57C00"
-            elif score >= 1875: return "#B89742"
-            elif score >= 1250: return "#9E9D24"
-            elif score >= 625: return "#43A047"
-            return "#1B5E20"
-
+        # GAS本番環境の文言に完全同期
         ROLE_MATRIX = [
             ["ステルス忍者", "壁の花", "ふつうの人", "作り笑い人形", "応援団長"],
             ["歩く火薬庫", "心のシャッター", "事なかれ主義者", "何でも屋", "肯定マシーン"],
@@ -778,6 +769,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             except IndexError:
                 return "謎の存在"
 
+        # 五行カラーをGAS本番環境に完全同期
         TYPE_INFO = [
             {"name": "委員長", "color": "#2E7D32"},    # 1 木 (緑)
             {"name": "裏回し", "color": "#2E7D32"},    # 2 木 (緑)
@@ -791,7 +783,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             {"name": "全肯定bot", "color": "#1565C0"}  # 10 水 (青)
         ]
 
-        # ★GitHubのRaw URLを指定（1.png 〜 10.png に完全対応）
+        # GitHubのRaw URLを指定（1.png 〜 10.png に完全対応）
         CHARA_IMAGES = {
             1: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/1.png",
             2: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/2.png",
@@ -805,7 +797,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
             10: "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/10.png"
         }
 
-        # ★マトリクス図のGitHub Raw URLを指定
+        # マトリクス図のGitHub Raw URLを指定
         MATRIX_IMAGE_URL = "https://raw.githubusercontent.com/Esupapiyon/project-map-app/main/images/matrix_preview.png"
 
         # --- 2. ユーザー固有データの取得と計算 ---
@@ -829,7 +821,9 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 
         rank_letter, rank_color = calc_rank(user_data_calc)
         danger_score = calc_danger_score(user_data_calc)
-        danger_color = get_danger_color(danger_score)
+        
+        # ★修正4：危険度スコアのカラーをブランドカラー（赤茶色）に固定
+        danger_color = "#8B3A1F"
 
         type_info = TYPE_INFO[current_type_id - 1]
         type_name = type_info['name']
@@ -867,7 +861,7 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
         encoded_message = urllib.parse.quote(line_message)
         line_link = f"https://line.me/R/oaMessage/@736ihkeb/?{encoded_message}"
 
-        # --- 4. HTML/CSS構成（完全版） ---
+        # --- 4. HTML/CSS構成（最終版） ---
         IVORY = "#F5F0E6"
         GOLD = "#C9A961"
         DARK_GOLD = "#B89345"
@@ -898,35 +892,45 @@ def render_result_component(content, fate_code, fate_scores, big5_norm=None, is_
 .certificate-preview-container {{ width: 100%; max-width: 400px; margin: 1.5rem auto; background-color: #FFFFFF; border: 1px solid {GOLD}; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
 .cert-clear-section {{ padding: 0; }}
 .cert-header {{ background-color: {DARK_GOLD}; color: #FFFFFF; font-weight: bold; text-align: center; padding: 1rem; font-size: 1rem; }}
-.cert-body-clear {{ display: flex; padding: 1rem; gap: 1rem; }}
-.cert-avatar {{ flex: 0 0 40%; }}
-.cert-avatar img {{ width: 100%; height: auto; object-fit: contain; }}
-.cert-info {{ flex: 1; display: flex; flex-direction: column; text-align: left; }}
-.cert-name-label, .cert-rank-label, .cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin-top: 0.5rem; }}
-.cert-name-value {{ color: #333333; font-size: 1.15rem; font-weight: bold; word-break: break-all; }}
+
+/* ★修正2: 左右カラムを垂直中央揃え */
+.cert-body-clear {{ display: flex; padding: 1rem; gap: 1rem; align-items: center; }}
+.cert-avatar {{ flex: 0 0 40%; display: flex; align-items: center; justify-content: center; }}
+.cert-avatar img {{ width: 100%; height: auto; max-height: 180px; object-fit: contain; }}
+
+/* ★修正1: 要素間marginの統一・不要な空白の削除 */
+.cert-info {{ flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 0; text-align: left; }}
+.cert-name-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
+.cert-name-value {{ color: #333333; font-size: 1.15rem; font-weight: bold; word-break: break-all; margin: 0; margin-top: 0.25rem; }}
 .cert-separator {{ border: 0; border-top: 1px solid #EEEEEE; margin: 0.5rem 0; }}
-.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }}
+.cert-rank-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
+.cert-rank-value {{ display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.25rem; margin-bottom: 0.5rem; }}
 .rank-display {{ color: #AAAAAA; font-size: 0.65rem; }}
 .rank-current {{ font-weight: bold; font-size: 1rem; }}
-.cert-danger-value {{ display: flex; align-items: baseline; }}
+.cert-danger-label {{ color: {DARK_GOLD}; font-size: 0.7rem; font-weight: bold; margin: 0; }}
+.cert-danger-value {{ display: flex; align-items: baseline; margin-top: 0.25rem; }}
 .danger-main {{ font-size: 1rem; font-weight: bold; }}
 .danger-max {{ color: #AAAAAA; font-size: 0.7rem; margin-left: 0.25rem; }}
 .cert-danger-note {{ color: #999999; font-size: 0.65rem; margin-top: 0.25rem; }}
-.cert-fate-frame {{ margin: 0.5rem 1rem; padding: 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
-.fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.75rem; }}
-.fate-current {{ color: #FFFFFF; font-size: 0.95rem; font-weight: bold; margin-top: 0.25rem; }}
 
-.cert-blur-section {{ position: relative; padding: 1rem; min-height: 150px; text-align: left; }}
-.cert-blur-content {{ filter: blur(4px); opacity: 0.6; user-select: none; }}
+/* ★修正5: 宿命vs現在フレームのサイズ・視覚階層調整 */
+.cert-fate-frame {{ margin: 0.25rem 1rem 1rem 1rem; padding: 0.5rem 0.75rem; border: 1px solid {DARK_GOLD}; border-radius: 6px; text-align: center; }}
+.fate-label {{ color: rgba(255,255,255,0.85); font-size: 0.7rem; }}
+.fate-current {{ color: #FFFFFF; font-size: 0.85rem; font-weight: bold; margin-top: 0.15rem; }}
+
+/* ★修正6, 7: 本文ぼかし強化・CTAテキスト位置調整 */
+.cert-blur-section {{ position: relative; padding: 1rem; min-height: 120px; text-align: left; }}
+.cert-blur-content {{ filter: blur(6px); -webkit-filter: blur(6px); opacity: 0.5; user-select: none; }}
 .blur-section-title {{ color: {DARK_GOLD}; font-size: 0.75rem; font-weight: bold; margin-top: 0.75rem; }}
 .blur-text {{ color: #333333; font-size: 0.8rem; line-height: 1.4; margin-top: 0.25rem; }}
 .blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 40%, rgba(255, 255, 255, 0.95) 100%); pointer-events: none; }}
-.line-cta-text {{ position: absolute; bottom: 1rem; left: 0; width: 100%; text-align: center; color: {GOLD}; font-size: 0.9rem; font-weight: bold; z-index: 2; }}
+.line-cta-text {{ position: absolute; bottom: 0.75rem; left: 0; width: 100%; text-align: center; color: {GOLD}; font-size: 0.85rem; font-weight: bold; z-index: 2; }}
 
+/* ★修正3: マトリクス図のぼかし大幅強化 */
 .matrix-preview-container {{ position: relative; width: 100%; max-width: 400px; margin: 1rem auto; }}
-.matrix-image {{ width: 100%; height: auto; display: block; border-radius: 8px; }}
-.matrix-blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(255, 252, 249, 0) 25%, rgba(255, 252, 249, 0.85) 75%, rgba(255, 252, 249, 1) 100%); pointer-events: none; border-radius: 8px; }}
-.matrix-cta-text {{ text-align: center; color: {GOLD}; font-size: 0.9rem; font-weight: bold; margin-top: -15px; position: relative; z-index: 2; padding-bottom: 5px; }}
+.matrix-image {{ width: 100%; height: auto; display: block; border-radius: 8px; filter: blur(6px); -webkit-filter: blur(6px); }}
+.matrix-blur-overlay {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(245, 240, 230, 0.3) 0%, rgba(245, 240, 230, 0.85) 50%, rgba(245, 240, 230, 1) 100%); pointer-events: none; border-radius: 8px; }}
+.matrix-cta-text {{ text-align: center; color: {GOLD}; font-size: 0.85rem; font-weight: bold; margin-top: 0.5rem; position: relative; z-index: 2; }}
 </style>
 <div style="font-family: {FONT_FAMILY}; margin-top: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05);">
 
